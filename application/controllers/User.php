@@ -8,6 +8,12 @@ class User extends CI_Controller
         $this->load->model("UserModel");
     }
 
+    public function index()
+    {
+        $this->load->helper('url');
+        $this->load->view('header');
+    }
+
     public function create($name, $account, $password)
     {
         echo $this->UserModel->create($name, $account, $password);
