@@ -12,6 +12,16 @@ class User extends CI_Controller
     {
         echo $this->UserModel->create($name, $account, $password);
     }
+    
+    public function isNameExist($name)
+    {
+        echo $this->UserModel->exist("userName", $name);
+    }
+    
+    public function isAccountExist($name)
+    {
+        echo $this->UserModel->exist("account", $name);
+    }
 }
 
 ?>
