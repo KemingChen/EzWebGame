@@ -48,7 +48,7 @@
 $active_group = 'default';
 $active_record = TRUE;
 
-$db['default']['hostname'] = '140.124.181.7';
+$db['default']['hostname'] = '140.124.181.7:2819';
 $db['default']['username'] = 'GameRound';
 $db['default']['password'] = '1221';
 $db['default']['database'] = 'gameround';
