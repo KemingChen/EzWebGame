@@ -4,10 +4,10 @@ class SSEtest extends CI_Controller
 {
 	public function index()
 	{
-		//$this->load->view('SSEtestResult');
         header("Content-Type: text/event-stream");  
         header('Cache-Control: no-cache');
-        flush();  
+        if (ob_get_level()) ob_end_flush();;
+        
         $count = 0;  
         while($count<5) {  
             echo "data: " . "Server Sent Event round: " . $count . "\n\n";  
@@ -17,6 +17,4 @@ class SSEtest extends CI_Controller
         }
 	}
 }
-
-/* End of file welcome.php */
-/* Location: ./application/controllers/welcome.php */
+?>
