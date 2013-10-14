@@ -8,12 +8,6 @@ class User extends CI_Controller
         $this->load->model("UserModel");
     }
 
-    public function index()
-    {
-        $this->load->helper('url');
-        $this->load->view('header');
-    }
-
     //創建使用者帳號密碼
     public function signup($name, $account, $password)
     {
@@ -33,13 +27,17 @@ class User extends CI_Controller
     }
 
     //登入
-    public function login($game, $account, $password)
+    public function login($key, $gameId, $account, $password)
     {
+        $this->load->model("GameModel");
+        $gAuth = $this->GameModel->checkKey($gameId, $key);//確認此key可以用來登入此遊戲
         $auth = $this->UserModel->checkAuth($account, $password);
         //print_r($auth);
-        if ($auth != false)
+        if ($gAuth && $auth != false)
         {
-            $key = $this->UserModel->keygen($auth["id"], $game, -1);
+            $this->GameModel->deleteKey($key);//刪除登入時使用的Key
+            $key = $this->UserModel->keygen($auth["id"], $gameId, -1);//產生新的溝通key
+            $this->UserModel->saveKey($auth["id"], $gameId, $key);//儲存溝通key 使下次可以做認證
             echo $key;
         }
         else

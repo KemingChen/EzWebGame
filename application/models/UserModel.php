@@ -2,13 +2,13 @@
 
 class UserModel extends CI_Model
 {
-    //parent::__construct();
     public function __construct()
     {
         parent::__construct();
         $this->load->database();
     }
 
+    // 創建使用者
     public function create($name, $account, $password)
     {
         $data = array('userName' => $name, 'account' => $account, 'password' => $password);
@@ -16,6 +16,7 @@ class UserModel extends CI_Model
         return $this->db->insert_id();
     }
 
+    // 確認某欄資料是否存在
     public function exist($field, $value)
     {
         $this->db->select($field);
@@ -24,6 +25,7 @@ class UserModel extends CI_Model
         return $this->db->count_all_results() > 0;
     }
 
+    // 確認使用者帳號密碼
     public function checkAuth($account, $password)
     {
         $this->db->select("id, userName");
@@ -36,10 +38,11 @@ class UserModel extends CI_Model
         return $isPermit ? array("id" => $result[0]->id, "name" => $result[0]->userName) : false;
     }
 
+    // 金鑰產生器
     public function keygen($uerId, $gameId, $roomId)
     {
         $length = 10;
-        $Ckey = '';
+        $cKey = '';
         $microtime = microtime();
 
         list($usec, $sec) = explode(' ', $microtime);
@@ -49,15 +52,15 @@ class UserModel extends CI_Model
 
         for ($i = 0; $i < $length; $i++)
         {
-            $Ckey .= $inputs{mt_rand(0, 61)};
+            $cKey .= $inputs{mt_rand(0, 61)};
         }
 
-        $key = sprintf("%s_%d_%d_%d", $Ckey, $uerId, $gameId, $roomId);
-        $this->saveKey($uerId, $gameId, $key);
+        $key = sprintf("%s_%d_%d_%d", $cKey, $uerId, $gameId, $roomId);
         return $key;
     }
 
-    private function saveKey($uerId, $gameId, $key)
+    // 儲存Key 給下次溝通用
+    public function saveKey($uerId, $gameId, $key)
     {
         $data = array('userId' => $uerId, 'gameId' => $gameId, 'key' => $key);
 
@@ -83,29 +86,27 @@ class UserModel extends CI_Model
         }
     }
 
+    // 刪除此溝通 key
     public function deleteKey($key)
     {
-        list($CKey, $uerId, $gameId, $roomId) = explode('_', $key);
+        list($cKey, $uerId, $gameId, $roomId) = explode('_', $key);
         $this->db->where('userId', $uerId);
         $this->db->where('gameId', $gameId);
         $this->db->delete('auth');
     }
 
+    // 檢查此溝通 key 是否存在
     public function checkKey($key)
     {
-        list($CKey, $uerId, $gameId, $roomId) = explode('_', $key);
+        list($cKey, $uerId, $gameId, $roomId) = explode('_', $key);
         $this->db->select("key");
         $this->db->from('auth');
         $this->db->where('userId', $uerId);
         $this->db->where('gameId', $gameId);
+        $this->db->where('key', $key);
         $result = $this->db->get()->result();
         
-        if (count($result) > 0)
-        {
-            //echo $result[0]->key."<br />";
-            return $result[0]->key == $key ? true : false;
-        }
-        return false;
+        return count($result) > 0 ? true : false;
     }
 }
 

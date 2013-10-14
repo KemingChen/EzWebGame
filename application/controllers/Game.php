@@ -1,19 +1,29 @@
 <?php
 
-class SSEtest extends CI_Controller
+class Game extends CI_Controller
 {
     public function __construct()
     {
         parent::__construct();
-        //$this->load->model("BookModel");
-        //上傳檔案要用的
-        //$this->load->helper(array('form', 'url'));
-        //        $this->load->library('upload');
-        //        $this->load->helper('form');
-        //        $this->load->library('form_validation');
+        $this->load->model("GameModel");
     }
-
-
+    
+    public function loadEzWebGameLib($gameId, $gKey)
+    {
+        $this->load->model("UserModel");
+        $auth = $this->GameModel->checkAuth($gameId, $gKey);
+        print_r($auth);
+        if($auth != false)
+        {
+            $key = $this->UserModel->keygen(-1, $gameId, -1);
+            $this->GameModel->saveKey($key);
+            echo $key;
+        }
+        else
+        {
+            echo "404 Error";
+        }
+    }
 }
 
 ?>
