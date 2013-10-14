@@ -15,7 +15,7 @@ class User extends CI_Controller
     }
 
     //創建使用者帳號密碼
-    public function create($name, $account, $password)
+    public function signup($name, $account, $password)
     {
         echo $this->UserModel->create($name, $account, $password);
     }
@@ -27,15 +27,15 @@ class User extends CI_Controller
     }
 
     //確認此帳號是否存在
-    public function isAccountExist($name)
+    public function isAccountExist($account)
     {
-        echo $this->UserModel->exist("account", $name);
+        echo $this->UserModel->exist("account", $account);
     }
 
     //登入
     public function login($game, $account, $password)
     {
-        $auth = $this->UserModel->checkLogin($account, $password);
+        $auth = $this->UserModel->checkAuth($account, $password);
         //print_r($auth);
         if ($auth != false)
         {

@@ -24,7 +24,7 @@ class UserModel extends CI_Model
         return $this->db->count_all_results() > 0;
     }
 
-    public function checkLogin($account, $password)
+    public function checkAuth($account, $password)
     {
         $this->db->select("id, userName");
         $this->db->from('user');
@@ -32,8 +32,8 @@ class UserModel extends CI_Model
         $this->db->where('password', $password);
         $result = $this->db->get()->result();
 
-        $hasLogin = count($result) > 0;
-        return $hasLogin ? array("id" => $result[0]->id, "name" => $result[0]->userName) : false;
+        $isPermit = count($result) > 0;
+        return $isPermit ? array("id" => $result[0]->id, "name" => $result[0]->userName) : false;
     }
 
     public function keygen($uerId, $gameId, $roomId)
