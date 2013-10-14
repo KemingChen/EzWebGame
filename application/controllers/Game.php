@@ -8,6 +8,7 @@ class Game extends CI_Controller
         $this->load->model("GameModel");
     }
     
+    // 下載 EzWebGameLib
     public function loadEzWebGameLib($gameId, $gKey)
     {
         $this->load->model("UserModel");

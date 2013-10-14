@@ -8,7 +8,7 @@ class GameModel extends CI_Model
         $this->load->database();
     }
 
-    //遊戲資訊確認
+    // 確認 gKey 與 game 可以 match
     public function checkAuth($gameId, $gKey)
     {
         $this->db->select("id, gameName");
@@ -21,7 +21,7 @@ class GameModel extends CI_Model
         return $isPermit ? array("id" => $result[0]->id, "name" => $result[0]->gameName) : false;
     }
 
-    //儲存Key給 使用者遊戲登入使用
+    // 儲存key 給使用者登入此遊戲用
     public function saveKey($key)
     {
         list($cKey, $uerId, $gameId, $roomId) = explode('_', $key);
@@ -30,12 +30,12 @@ class GameModel extends CI_Model
         $this->db->insert('gauth', $data);
     }
 
-    //確認key是否可給使用者 登入此遊戲用
-    public function checkKey($id, $key)
+    // 確認key 可給使用者 登入此遊戲用
+    public function checkKey($iGameId, $key)
     {
         list($cKey, $uerId, $gameId, $roomId) = explode('_', $key);
 
-        if ($id != $gameId)//遊戲Id不同
+        if ($iGameId != $gameId)//gameId 無法 match
             return false;
 
         $this->db->select("id");
@@ -47,7 +47,7 @@ class GameModel extends CI_Model
         return count($result) > 0 ? true : false;
     }
 
-    //刪除此遊戲登入key
+    // 刪除給此遊戲登入用的 key
     public function deleteKey($key)
     {
         list($cKey, $uerId, $gameId, $roomId) = explode('_', $key);

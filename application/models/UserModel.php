@@ -16,7 +16,7 @@ class UserModel extends CI_Model
         return $this->db->insert_id();
     }
 
-    // 確認某欄資料是否存在
+    // 確認某欄資料在 user資料表 中是否存在
     public function exist($field, $value)
     {
         $this->db->select($field);
@@ -59,7 +59,7 @@ class UserModel extends CI_Model
         return $key;
     }
 
-    // 儲存Key 給下次溝通用
+    // 儲存key 給下次溝通用
     public function saveKey($uerId, $gameId, $key)
     {
         $data = array('userId' => $uerId, 'gameId' => $gameId, 'key' => $key);
