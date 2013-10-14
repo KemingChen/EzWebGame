@@ -59,6 +59,8 @@ class UserModel extends CI_Model
 
     private function saveKey($uerId, $gameId, $key)
     {
+        $data = array('userId' => $uerId, 'gameId' => $gameId, 'key' => $key);
+        
         $this->db->select("id");
         $this->db->from('auth');
         $this->db->where('userId', $uerId);
@@ -67,15 +69,13 @@ class UserModel extends CI_Model
 
         if (count($result) > 0)
         {
-
+            $this->db->where('id', $result[0]->id);
+            $this->db->update('auth', $data); 
         }
         else
         {
-
+            $this->db->insert('auth', $data);
         }
-        $data = array('title' => 'My title', 'name' => 'My Name', 'date' => 'My date');
-
-        $this->db->insert('mytable', $data);
     }
 }
 
