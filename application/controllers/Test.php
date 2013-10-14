@@ -6,7 +6,7 @@ class Test extends CI_Controller
     {
         parent::__construct();
     }
-    
+
     public function testCheckKey($key)
     {
         $this->load->model("UserModel");

@@ -13,7 +13,9 @@ class Game extends CI_Controller
     {
         if (!$this->isNameExist($name))
         {
-            echo $this->GameModel->create($name, $password);
+            $this->load->model("AuthModel");
+            $gKey = $this->AuthModel->keygen(18);
+            echo $this->GameModel->create($name, $gKey, $password);
         }
         else
         {
@@ -26,7 +28,7 @@ class Game extends CI_Controller
     {
         return $this->GameModel->exist("gameName", $name);
     }
-
+    
     // 得到 gKey
     public function getGameKey($name, $password)
     {
@@ -36,14 +38,15 @@ class Game extends CI_Controller
     // 下載 EzWebGameLib
     public function loadEzWebGameLib($gameId, $gKey)
     {
-        $this->load->model("UserModel");
         $auth = $this->GameModel->checkAuth($gameId, $gKey);
-        print_r($auth);
+        //print_r($auth);
         if ($auth != false)
         {
-            $key = $this->UserModel->keygen(-1, $gameId, -1);
-            $this->GameModel->saveKey($key);
-            echo $key;
+            $this->load->model("AuthModel");
+            $this->load->model("GAuthModel");
+            $loginKey = sprintf("%s_%d", $this->AuthModel->keygen(12), $gameId);
+            $this->GAuthModel->saveLoginKey($loginKey);
+            echo $loginKey;
         }
         else
         {
