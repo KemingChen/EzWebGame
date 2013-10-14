@@ -8,6 +8,34 @@ class GameModel extends CI_Model
         $this->load->database();
     }
 
+    // 創建遊戲
+    public function create($name, $password)
+    {
+        $gKey = $this->gKeygen();
+        $data = array('gameName' => $name, 'gKey' => $gKey, 'password' => $password);
+        $this->db->insert('gameinfo', $data);
+        return $gKey;
+    }
+
+    // 確認某欄資料在 user資料表 中是否存在
+    public function exist($field, $value)
+    {
+        $this->db->select($field);
+        $this->db->from('gameinfo');
+        $this->db->where($field, $value);
+        return $this->db->count_all_results() > 0;
+    }
+
+    public function getGameKey($name, $password)
+    {
+        $this->db->select("gKey");
+        $this->db->from('gameinfo');
+        $this->db->where('gameName', $name);
+        $this->db->where('password', $password);
+        $result = $this->db->get()->result();
+        return count($result) > 0 ? $result[0]->gKey : 0;
+    }
+
     // 確認 gKey 與 game 可以 match
     public function checkAuth($gameId, $gKey)
     {
@@ -35,7 +63,8 @@ class GameModel extends CI_Model
     {
         list($cKey, $uerId, $gameId, $roomId) = explode('_', $key);
 
-        if ($iGameId != $gameId)//gameId 無法 match
+        if ($iGameId != $gameId) //gameId 無法 match
+
             return false;
 
         $this->db->select("id");
@@ -54,6 +83,26 @@ class GameModel extends CI_Model
         $this->db->where('gameId', $gameId);
         $this->db->where('key', $key);
         $this->db->delete('gauth');
+    }
+
+    // gKey 產生器
+    private function gKeygen()
+    {
+        $length = 18;
+        $gKey = '';
+        $microtime = microtime();
+
+        list($usec, $sec) = explode(' ', $microtime);
+        mt_srand((float)$sec + ((float)$usec * 100000));
+
+        $inputs = array_merge(range('z', 'a'), range(0, 9), range('A', 'Z'));
+
+        for ($i = 0; $i < $length; $i++)
+        {
+            $gKey .= $inputs{mt_rand(0, 61)};
+        }
+
+        return $gKey;
     }
 }
 
