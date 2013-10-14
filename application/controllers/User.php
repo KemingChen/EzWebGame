@@ -47,6 +47,11 @@ class User extends CI_Controller
             echo 0;
         }
     }
+    
+    public function logout($key)
+    {
+        $this->UserModel->deleteKey($key);
+    }
 }
 
 ?>

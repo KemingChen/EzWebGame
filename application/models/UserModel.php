@@ -83,6 +83,14 @@ class UserModel extends CI_Model
         }
     }
 
+    public function deleteKey($key)
+    {
+        list($CKey, $uerId, $gameId, $roomId) = explode('_', $key);
+        $this->db->where('userId', $uerId);
+        $this->db->where('gameId', $gameId);
+        $this->db->delete('auth');
+    }
+
     public function checkKey($key)
     {
         list($CKey, $uerId, $gameId, $roomId) = explode('_', $key);
