@@ -52,7 +52,7 @@ class UserModel extends CI_Model
             $Ckey .= $inputs{mt_rand(0, 61)};
         }
 
-        $key = sprintf("%s*%d*%d*%d", $Ckey, $uerId, $gameId, $roomId);
+        $key = sprintf("%s_%d_%d_%d", $Ckey, $uerId, $gameId, $roomId);
         $this->saveKey($uerId, $gameId, $key);
         return $key;
     }
@@ -60,22 +60,44 @@ class UserModel extends CI_Model
     private function saveKey($uerId, $gameId, $key)
     {
         $data = array('userId' => $uerId, 'gameId' => $gameId, 'key' => $key);
-        
+
         $this->db->select("id");
         $this->db->from('auth');
         $this->db->where('userId', $uerId);
         $this->db->where('gameId', $gameId);
         $result = $this->db->get()->result();
-
+        
+        //echo count($result) > 0 ? "count > 0;" : "count <= 0";
+        
         if (count($result) > 0)
         {
+            //echo $result[0]->id .";";
+            //print_r($data);
             $this->db->where('id', $result[0]->id);
-            $this->db->update('auth', $data); 
+            $this->db->update('auth', $data);
+            //echo $this->db->last_query();
         }
         else
         {
             $this->db->insert('auth', $data);
         }
+    }
+
+    public function checkKey($key)
+    {
+        list($CKey, $uerId, $gameId, $roomId) = explode('_', $key);
+        $this->db->select("key");
+        $this->db->from('auth');
+        $this->db->where('userId', $uerId);
+        $this->db->where('gameId', $gameId);
+        $result = $this->db->get()->result();
+        
+        if (count($result) > 0)
+        {
+            //echo $result[0]->key."<br />";
+            return $result[0]->key == $key ? true : false;
+        }
+        return false;
     }
 }
 
