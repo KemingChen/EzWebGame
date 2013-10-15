@@ -8,6 +8,20 @@ class AuthModel extends CI_Model
         $this->load->database();
     }
     
+    // 確認通訊 Key 並產生下一組通訊 Key 並儲存起來
+    public function getNextCommuKey($cKey)
+    {
+        if($this->checkCommuKey($cKey))
+        {
+            list($key, $uerId, $gameId, $roomId) = explode('_', $cKey);
+            $cKey = $this->commuKeygen($uerId, $gameId, $roomId);
+            $this->saveCommuKey($uerId, $gameId, $cKey);
+            return $cKey;
+        }
+        echo json_encode(array("Error" => "Communication Key Error"));
+        exit;
+    }
+    
     // 通訊 Key 產生器
     public function commuKeygen($uerId, $gameId, $roomId)
     {
