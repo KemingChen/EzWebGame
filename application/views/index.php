@@ -6,13 +6,11 @@
 
       <div class="row marketing">
         <div class="col-lg-6">
-          <h4>Subheading</h4>
-          <p>Donec id elit non mi porta gravida at eget metus. Maecenas faucibus mollis interdum.</p>
-
+          <h4>Developer</h4>
+          <p>Register your game and get EzWebGameLib for free!</p>
         </div>
-
         <div class="col-lg-6">
-          <h4>Subheading</h4>
-          <p>Donec id elit non mi porta gravida at eget metus. Maecenas faucibus mollis interdum.</p>
+          <h4>Member</h4>
+          <p>Become a member and play games on EzWebGames!</p>
         </div>
       </div>
