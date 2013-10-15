@@ -19,6 +19,14 @@ class Member extends CI_Controller
         $this->load->view('Member/signup');
         $this->load->view('footer');
     }
+    
+    public function login($gKey)
+    {
+        $data["gKey"] = $gKey;
+        $this->load->view('header');
+        $this->load->view('Member/login',$data);
+        $this->load->view('footer');
+    }
 }
 
 ?>
