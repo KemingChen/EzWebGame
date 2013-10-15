@@ -11,7 +11,7 @@ class User extends CI_Controller
     // 創建使用者帳號密碼
     public function signup($name, $account, $password)
     {
-        if (!$this->isAccountExist($account) && !$this->isNameExist($name))
+        if (!$this->UserModel->exist("account", $account) && !$this->UserModel->exist("userName", $name))
         {
             echo $this->UserModel->create($name, $account, $password);
         }
