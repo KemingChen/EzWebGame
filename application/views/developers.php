@@ -20,9 +20,9 @@
 <br />
 <br />
 <script type="text/javascript">
-console.log('123');
 $(".header ul li").each(function(){$(this).removeClass('active')});
 $(".header ul li:eq(1)").addClass('active');
+
 $("#dataInputDIV").hide();
 $("input[value='Register Game']").on('click',function(){
     if($(dataInputDIV).css('display')=='none')
@@ -62,7 +62,6 @@ function sendNameAndPasswordTo(baseURL,resultModalTitle)
         $.ajax({
     		url: baseURL+'/'+name+'/'+password
     	}).done(function(data) {
-    		console.log(data);
             $('#myModal .modal-title').text(resultModalTitle);
             $('#myModal .modal-body').html(data);
             $('#myModal').modal();

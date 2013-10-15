@@ -30,7 +30,7 @@
         <ul class="nav nav-pills pull-right">
           <li class="active"><a href="<?=base_url("")?>">Home</a></li>
           <li><a href="<?=base_url("Developers")?>">Developers</a></li>
-          <li><a href="#">Member</a></li>
+          <li><a href="<?=base_url("Member")?>">Member</a></li>
         </ul>
         <h3 class="text-muted">EzWebGame</h3>
     </div>
