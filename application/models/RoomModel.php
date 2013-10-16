@@ -45,19 +45,25 @@ class RoomModel extends CI_Model
         $this->db->where("roomId", $roomId);
         $this->db->where("userId", $userId);
         $this->db->delete('room_to_user');
+        $this->db->trans_begin();
+        $plasyers = $this->getRoomPlayers($roomId);
+        if (count($plasyers) <= 0)
+        {
+            $this->db->where("id", $roomId);
+            $this->db->delete("gameroom");
+        }
+        
+        if ($this->db->trans_status() === false)
+            $this->db->trans_rollback();
+        else
+            $this->db->trans_commit();
     }
 
     // 房間資訊
     public function roomInfo($gameId, $out, $roomId = false)
     {
-        $this->db->select("gameroom.id, title, max, count(room_to_user.id) as now");
-        $this->db->from("gameroom");
-        if ($roomId != false)
-            $this->db->where("gameroom.id", $roomId);
-        $this->db->where("status", "wait");
-        $this->db->join("room_to_user", "gameroom.id = room_to_user.roomId", "left");
-        $result = $this->db->get()->result();
-        
+        $result = $this->getRooms($gameId, $out, $roomId);
+
         $room = array();
         foreach ($result as $row)
         {
@@ -65,32 +71,51 @@ class RoomModel extends CI_Model
             $array["id"] = $row->id;
             $array["title"] = $row->title;
             $array["max"] = $row->max;
+            $array["min"] = $row->min;
             $array["now"] = $row->now;
-            
+
             array_push($room, $array);
         }
         $out->save("Room", $room);
     }
 
-    // 玩家資訊
+    // 房間中玩家資訊
     public function playerInfo($roomId, $out)
     {
-        $this->db->select("user.id, user.userName");
-        $this->db->from("room_to_user");
-        $this->db->where("room_to_user.id", $roomId);
-        $this->db->join("user", "user.id = room_to_user.userId", "left");
-        $result = $this->db->get()->result();
-        
+        $result = $this->getRoomPlayers($roomId);
+
         $player = array();
         foreach ($result as $row)
         {
             $array = array();
             $array["userId"] = $row->id;
             $array["userName"] = $row->userName;
-            
+
             array_push($player, $array);
         }
         $out->save("Player", $player);
+    }
+
+    // 得到房間(未處理成array物件)
+    private function getRooms($gameId, $out, $roomId)
+    {
+        $this->db->select("gameroom.id, title, min, max, count(room_to_user.id) as now");
+        $this->db->from("gameroom");
+        if ($roomId != false)
+            $this->db->where("gameroom.id", $roomId);
+        $this->db->where("status", "wait");
+        $this->db->join("room_to_user", "gameroom.id = room_to_user.roomId", "left");
+        return $this->db->get()->result();
+    }
+
+    // 得到房間中玩家資訊(未處理成array物件)
+    private function getRoomPlayers($roomId)
+    {
+        $this->db->select("user.id, user.userName");
+        $this->db->from("room_to_user");
+        $this->db->where("room_to_user.id", $roomId);
+        $this->db->join("user", "user.id = room_to_user.userId", "left");
+        return $this->db->get()->result();
     }
 
     // 修改房間資訊
@@ -129,7 +154,7 @@ class RoomModel extends CI_Model
     }
 
     // 確認玩家有無在其他房間內
-    private function checkUserNotInAnyRoom($userId, $out)
+    public function checkUserNotInAnyRoom($userId, $out)
     {
         $this->db->select("roomId");
         $this->db->from('room_to_user');
