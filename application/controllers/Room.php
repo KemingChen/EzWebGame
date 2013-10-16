@@ -44,6 +44,22 @@ class Room extends CI_Controller
         $this->out->show();
     }
     
+    // 查詢所有未開始房間
+    public function getList($cKey)
+    {
+        $nextCKey = $this->AuthModel->getNextCommuKey($cKey, $this->out);
+        list($key, $userId, $gameId, $roomId) = explode('_', $cKey);
+        $this->RoomModel->rooms($gameId, $this->out);
+        $this->out->show();
+    }
+    
+    public function modifyTitle($title, $cKey)
+    {
+        $nextCKey = $this->AuthModel->getNextCommuKey($cKey, $this->out);
+        list($key, $userId, $gameId, $roomId) = explode('_', $cKey);
+        
+    }
+    
     // 遊戲設定玩家人數上下限 防呆機制
     private function checkPlayerNumber($minPlayer, $maxPlayer)
     {
