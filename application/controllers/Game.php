@@ -15,11 +15,11 @@ class Game extends CI_Controller
         {
             $this->load->model("AuthModel");
             $gKey = $this->AuthModel->keygen(18);
-            echo $this->GameModel->create($name, $gKey, $password);
+            echo 'Your Key is<br>'.$this->GameModel->create($name, $gKey, $password);
         }
         else
         {
-            echo "404 error";
+            echo "Name has been used!";
         }
     }
 
@@ -32,7 +32,11 @@ class Game extends CI_Controller
     // 得到 gKey
     public function getGameKey($name, $password)
     {
-        return $this->GameModel->getGameKey($name, $password);
+        $gKey = $this->GameModel->getGameKey($name, $password);
+        if($gKey=='0')
+            echo 'Incorrect Name or Password';
+        else
+            echo 'Your Key is<br>'.$gKey;
     }
 
     // 下載 EzWebGameLib
