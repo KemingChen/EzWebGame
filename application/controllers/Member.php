@@ -20,9 +20,9 @@ class Member extends CI_Controller
         $this->load->view('footer');
     }
     
-    public function login($gKey)
+    public function login($lKey=null)
     {
-        $data["gKey"] = $gKey;
+        $data["lKey"] = $lKey;
         $this->load->view('header');
         $this->load->view('Member/login',$data);
         $this->load->view('footer');
