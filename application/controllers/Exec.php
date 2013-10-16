@@ -9,24 +9,24 @@ class Exec extends CI_Controller
         $this->load->model("ExecModel");
         $this->load->model("AuthModel");
     }
-    
+
     // ¶}©l¹CÀ¸
     public function start($cKey)
     {
-        $nextCKey = $this->AuthModel->getNextCommuKey($cKey, $this->out);
+        //$nextCKey = $this->AuthModel->getNextCommuKey($cKey, $this->out);
         list($key, $userId, $gameId, $roomId) = explode('_', $cKey);
         $this->load->model("RoomModel", "room");
         $this->ExecModel->start($userId, $roomId, $this->out, $this->room);
         $this->out->save("Start", true);
         $this->out->show();
     }
-    
-    // 
+
+    //
     public function SendMessage($message, $cKey)
     {
         $nextCKey = $this->AuthModel->getNextCommuKey($cKey, $this->out);
         list($key, $userId, $gameId, $roomId) = explode('_', $cKey);
-        
+
     }
 }
 
