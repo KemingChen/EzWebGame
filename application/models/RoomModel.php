@@ -129,7 +129,7 @@ class RoomModel extends CI_Model
     }
 
     // 確認玩家有無在其他房間內
-    private function checkUserNotInAnyRoom($userId, $out)
+    public function checkUserNotInAnyRoom($userId, $out)
     {
         $this->db->select("roomId");
         $this->db->from('room_to_user');

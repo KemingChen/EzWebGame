@@ -17,9 +17,12 @@ class Room extends CI_Controller
         $this->checkPlayerNumber($minPlayer, $maxPlayer);
 
         list($key, $userId, $gameId, $roomId) = explode('_', $cKey);
+        $this->RoomModel->checkUserNotInAnyRoom($userId, $this->out);//檢查玩家是否有在任何房間中
+        
         $roomId = $this->RoomModel->create($gameId, $title, $minPlayer, $maxPlayer);
         $this->out->save("Create", $roomId);
-        $this->out->show();
+        
+        $this->join($roomId, $nextCKey);//自動加入剛創建的房間
     }
 
     // 加入房間
