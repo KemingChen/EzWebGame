@@ -64,7 +64,7 @@ class RoomModel extends CI_Model
     public function roomInfo($out, $roomId = false)
     {
         $result = $this->getRooms($out, $roomId);
-
+        
         $room = array();
         foreach ($result as $row)
         {
@@ -74,8 +74,9 @@ class RoomModel extends CI_Model
             $array["max"] = $row->max;
             $array["min"] = $row->min;
             $array["now"] = $row->now;
-
-            array_push($room, $array);
+            
+            if($row->id != null)
+                array_push($room, $array);
         }
         $out->save("Room", $room);
         return $room;

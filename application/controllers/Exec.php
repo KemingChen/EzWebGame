@@ -20,6 +20,14 @@ class Exec extends CI_Controller
         $this->out->save("Start", true);
         $this->out->show();
     }
+    
+    // 
+    public function SendMessage($message, $cKey)
+    {
+        $nextCKey = $this->AuthModel->getNextCommuKey($cKey, $this->out);
+        list($key, $userId, $gameId, $roomId) = explode('_', $cKey);
+        
+    }
 }
 
 ?>
