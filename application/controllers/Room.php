@@ -22,6 +22,7 @@ class Room extends CI_Controller
         $this->out->show();
     }
 
+    // 加入房間
     public function join($iRoomId, $cKey)
     {
         $nextCKey = $this->AuthModel->getNextCommuKey($cKey, $this->out);

@@ -17,16 +17,20 @@ class RoomModel extends CI_Model
         return $this->db->insert_id();
     }
 
+    // 加入房間
     public function join($userId, $roomId, $out)
     {
         $this->checkUserNotInAnyRoom($userId, $out);
-        //$this->db->trans_start();
+        $this->db->trans_begin();
+
         $this->checkRoomCanJoin($roomId, $out);
         $data = array("roomId" => $roomId, "userId" => $userId);
         $this->db->insert('room_to_user', $data);
-        //$this->db->trans_complete();
+
+        $this->db->trans_commit();
     }
 
+    // 確認此房間是否能加入
     private function checkRoomCanJoin($roomId, $out)
     {
         $this->db->select("max");
@@ -34,10 +38,12 @@ class RoomModel extends CI_Model
         $this->db->where('id', $roomId);
         $this->db->where('status', 'wait');
         $result = $this->db->get()->result();
-        //$out->debug(count($result));
-        //echo $this->db->last_query();
+        
         if (count($result) <= 0)
+        {
+            $this->db->trans_rollback();
             $out->wrong("No This Room or Status isn't Wait");
+        }
         $max = $result[0]->max;
 
         $this->db->select("roomId");
@@ -46,7 +52,10 @@ class RoomModel extends CI_Model
         $result = $this->db->get()->result();
 
         if (count($result) + 1 > $max)
+        {
+            $this->db->trans_rollback();
             $out->wrong("This Room is Full");
+        }
     }
 
     // 確認玩家有無在其他房間內
