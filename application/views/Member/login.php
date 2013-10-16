@@ -11,17 +11,37 @@
     if(opener!=null)
     {
         $("#login").click(function(){
-            //測試用,暫時回傳gKey
-            opener.key = "<?=$gKey?>";
-            if(opener.onLoginSuccess)
-                opener.onLoginSuccess();
-            window.close(); 
+            var account = $("#account").val();
+            var password = $("#password").val();
+            if(account==""||password=="")
+            {
+                alert("account or password empty");
+                return false;
+            }
+            $.ajax({
+        		url: "<?=base_url('/user/login/')?>"+"/<?php echo $lKey?>"+'/'+account+'/'+password,
+        	}).done(function(data) {
+                window.close();
+                data = JSON.parse(data);
+                if(data.Wrong!=null)
+                {
+                    if(opener.onLoginFail)
+                        opener.onLoginFail(data.Wrong);
+                }
+                else
+                {
+                    opener.Key = data.cKey;
+                    if(opener.onLoginSuccess)
+                        opener.onLoginSuccess();
+                }
+                
+        	});
         });
     }
     else
     {
         $("#login").click(function(){
-            alert('test');
+            alert('coming soon');
         });
     }
 })()
