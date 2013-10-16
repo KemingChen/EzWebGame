@@ -18,7 +18,7 @@ class Room extends CI_Controller
 
         list($key, $userId, $gameId, $roomId) = explode('_', $cKey);
         $roomId = $this->RoomModel->create($gameId, $title, $minPlayer, $maxPlayer);
-        $this->out->save("roomId", $roomId);
+        $this->out->save("Create", $roomId);
         $this->out->show();
     }
 
@@ -27,9 +27,14 @@ class Room extends CI_Controller
     {
         $nextCKey = $this->AuthModel->getNextCommuKey($cKey, $this->out);
         list($key, $userId, $gameId, $roomId) = explode('_', $cKey);
-        $isPermit = $this->RoomModel->join($userId, $iRoomId, $this->out);
+        $roomId = $this->RoomModel->join($userId, $iRoomId, $this->out);
+        if ($roomId != false)
+        {
+            $this->RoomModel->roomInfo($gameId, $this->out, $roomId);
+            $this->RoomModel->playerInfo($roomId, $this->out);
+        }
         $this->AuthModel->editCommuKey($nextCKey, $iRoomId, $this->out);
-        $this->out->save("Join", $isPermit);
+        $this->out->save("Join", $roomId);
         $this->out->show();
     }
 
@@ -45,11 +50,20 @@ class Room extends CI_Controller
     }
 
     // 查詢所有未開始房間
-    public function getList($cKey)
+    public function ListRoomInfos($cKey)
     {
         $nextCKey = $this->AuthModel->getNextCommuKey($cKey, $this->out);
         list($key, $userId, $gameId, $roomId) = explode('_', $cKey);
-        $this->RoomModel->rooms($gameId, $this->out);
+        $this->RoomModel->roomInfo($gameId, $this->out);
+        $this->out->show();
+    }
+
+    // 查詢某房間的所有玩家
+    public function ListRoomPlayers($cKey)
+    {
+        $nextCKey = $this->AuthModel->getNextCommuKey($cKey, $this->out);
+        list($key, $userId, $gameId, $roomId) = explode('_', $cKey);
+        $this->RoomModel->playerInfo($roomId, $this->out);
         $this->out->show();
     }
 
@@ -59,6 +73,19 @@ class Room extends CI_Controller
         $nextCKey = $this->AuthModel->getNextCommuKey($cKey, $this->out);
         list($key, $userId, $gameId, $roomId) = explode('_', $cKey);
         $data = array("title" => $iTitle);
+        $this->RoomModel->modify($roomId, $data);
+        $this->out->save("ModifyTitle", true);
+    }
+
+    // 修改房間 玩家人數上下限
+    public function ModifyMinMaxPlayer($minPlayer, $maxPlayer, $cKey)
+    {
+        $nextCKey = $this->AuthModel->getNextCommuKey($cKey, $this->out);
+        list($key, $userId, $gameId, $roomId) = explode('_', $cKey);
+
+        checkPlayerNumber($minPlayer, $maxPlayer);
+
+        $data = array("min" => $minPlayer, "max" => $maxPlayer);
         $this->RoomModel->modify($roomId, $data);
         $this->out->save("ModifyTitle", true);
     }

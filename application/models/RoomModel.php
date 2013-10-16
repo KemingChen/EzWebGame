@@ -47,23 +47,50 @@ class RoomModel extends CI_Model
         $this->db->delete('room_to_user');
     }
 
-    // 房間清單
-    public function rooms($gameId, $out)
+    // 房間資訊
+    public function roomInfo($gameId, $out, $roomId = false)
     {
         $this->db->select("gameroom.id, title, max, count(room_to_user.id) as now");
-        $this->db->from('gameroom');
-        $this->db->where('status', 'wait');
+        $this->db->from("gameroom");
+        if ($roomId != false)
+            $this->db->where("gameroom.id", $roomId);
+        $this->db->where("status", "wait");
         $this->db->join("room_to_user", "gameroom.id = room_to_user.roomId", "left");
         $result = $this->db->get()->result();
-
+        
+        $room = array();
         foreach ($result as $row)
         {
             $array = array();
+            $array["id"] = $row->id;
             $array["title"] = $row->title;
             $array["max"] = $row->max;
             $array["now"] = $row->now;
-            $out->save($row->id, $array);
+            
+            array_push($room, $array);
         }
+        $out->save("Room", $room);
+    }
+
+    // 玩家資訊
+    public function playerInfo($roomId, $out)
+    {
+        $this->db->select("user.id, user.userName");
+        $this->db->from("room_to_user");
+        $this->db->where("room_to_user.id", $roomId);
+        $this->db->join("user", "user.id = room_to_user.userId", "left");
+        $result = $this->db->get()->result();
+        
+        $player = array();
+        foreach ($result as $row)
+        {
+            $array = array();
+            $array["userId"] = $row->id;
+            $array["userName"] = $row->userName;
+            
+            array_push($player, $array);
+        }
+        $out->save("Player", $player);
     }
 
     // 修改房間資訊
@@ -71,11 +98,10 @@ class RoomModel extends CI_Model
     {
         $this->db->where("id", $roomId);
         $this->db->update('gameroom', $data);
-        
     }
 
     // 確認此房間是否能加入
-    private function checkRoomCanJoin($roomId, $out)
+    public function checkRoomCanJoin($roomId, $out)
     {
         $this->db->select("max");
         $this->db->from('gameroom');
