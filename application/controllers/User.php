@@ -20,7 +20,7 @@ class User extends CI_Controller
         }
         else
         {
-            $this->out->error("Account or UserName Repeat");
+            $this->out->wrong("Account or UserName Repeat");
         }
         $this->out->show();
     }
@@ -52,13 +52,13 @@ class User extends CI_Controller
         {
             $this->load->model("AuthModel");
             $this->GAuthModel->deleteLoginKey($lKey); // 刪除登入時使用的Key
-            $nextCKey = $this->AuthModel->commuKeygen($auth["id"], $gameId, -1); // 產生新的溝通key
-            $this->AuthModel->saveCommuKey($auth["id"], $gameId, $nextCKey); // 儲存溝通key 使下次可以做認證
+            $nextCKey = $this->AuthModel->commuKeygen($auth["id"], $gameId, 0); // 產生 溝通key
+            $this->AuthModel->saveCommuKey($auth["id"], $gameId, $nextCKey); // 儲存溝通key
             $this->out->save("cKey", $nextCKey);
         }
         else
         {
-            $this->out->error("Authentication failed");
+            $this->out->wrong("Authentication failed");
         }
         $this->out->show();
     }

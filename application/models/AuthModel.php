@@ -9,35 +9,45 @@ class AuthModel extends CI_Model
     }
 
     // 確認通訊 Key 並產生下一組通訊 Key 並儲存起來
-    public function getNextCommuKey($cKey)
+    public function getNextCommuKey($cKey, $out)
     {
         if ($this->checkCommuKey($cKey))
         {
-            list($key, $uerId, $gameId, $roomId) = explode('_', $cKey);
-            $cKey = $this->commuKeygen($uerId, $gameId, $roomId);
-            $this->saveCommuKey($uerId, $gameId, $cKey);
-            return $cKey;
+            list($key, $userId, $gameId, $roomId) = explode('_', $cKey);
+            $nextCKey = $this->commuKeygen($userId, $gameId, $roomId);
+            $this->saveCommuKey($userId, $gameId, $nextCKey);
+            $out->save("cKey", $nextCKey);
+            return $nextCKey;
         }
-        echo "Communication Key Error";
-        exit;
+        $out->wrong("Communication Key Deny");
+    }
+
+    // 修改溝通Key中所帶房間資訊
+    public function editCommuKey($cKey, $iRoomId, $out)
+    {
+        list($key, $userId, $gameId, $roomId) = explode('_', $cKey);
+        $nextCKey = $this->commuKeygen($userId, $gameId, $iRoomId);
+        $this->saveCommuKey($userId, $gameId, $nextCKey);
+        $out->save("cKey", $nextCKey);
+        return $nextCKey;
     }
 
     // 通訊 Key 產生器
-    public function commuKeygen($uerId, $gameId, $roomId)
+    public function commuKeygen($userId, $gameId, $roomId)
     {
         $key = $this->keygen(10);
-        $cKey = sprintf("%s_%d_%d_%d", $key, $uerId, $gameId, $roomId);
+        $cKey = sprintf("%s_%d_%d_%d", $key, $userId, $gameId, $roomId);
         return $cKey;
     }
 
     // 儲存通訊 Key
-    public function saveCommuKey($uerId, $gameId, $key)
+    public function saveCommuKey($userId, $gameId, $key)
     {
-        $data = array('userId' => $uerId, 'gameId' => $gameId, 'key' => $key);
+        $data = array('userId' => $userId, 'gameId' => $gameId, 'key' => $key);
 
         $this->db->select("id");
         $this->db->from('auth');
-        $this->db->where('userId', $uerId);
+        $this->db->where('userId', $userId);
         $this->db->where('gameId', $gameId);
         $result = $this->db->get()->result();
 
@@ -60,8 +70,8 @@ class AuthModel extends CI_Model
     // 刪除通訊 Key
     public function deleteCommuKey($cKey)
     {
-        list($key, $uerId, $gameId, $roomId) = explode('_', $cKey);
-        $this->db->where('userId', $uerId);
+        list($key, $userId, $gameId, $roomId) = explode('_', $cKey);
+        $this->db->where('userId', $userId);
         $this->db->where('gameId', $gameId);
         $this->db->delete('auth');
     }
@@ -69,14 +79,14 @@ class AuthModel extends CI_Model
     // 檢查通訊 Key 是否存在
     public function checkCommuKey($cKey)
     {
-        list($key, $uerId, $gameId, $roomId) = explode('_', $cKey);
+        list($key, $userId, $gameId, $roomId) = explode('_', $cKey);
         $this->db->select("key");
         $this->db->from('auth');
-        $this->db->where('userId', $uerId);
+        $this->db->where('userId', $userId);
         $this->db->where('gameId', $gameId);
         $this->db->where('key', $cKey);
         $result = $this->db->get()->result();
-
+        
         return count($result) > 0 ? true : false;
     }
 

@@ -13,16 +13,22 @@ class Room extends CI_Controller
     // 創建房間
     public function create($title, $minPlayer, $maxPlayer, $cKey)
     {
-        $nextCKey = $this->AuthModel->getNextCommuKey($cKey);
-        $this->out->save("cKey", $nextCKey);
+        $nextCKey = $this->AuthModel->getNextCommuKey($cKey, $this->out);
+        $this->checkPlayerNumber($minPlayer, $maxPlayer);
 
-        if ($this->checkPlayerNumber($minPlayer, $maxPlayer))
-        {
-            list($key, $uerId, $gameId, $roomId) = explode('_', $cKey);
-            $roomId = $this->RoomModel->create($gameId, $title, $minPlayer, $maxPlayer);
-            $this->out->save("roomId", $roomId);
-        }
+        list($key, $userId, $gameId, $roomId) = explode('_', $cKey);
+        $roomId = $this->RoomModel->create($gameId, $title, $minPlayer, $maxPlayer);
+        $this->out->save("roomId", $roomId);
+        $this->out->show();
+    }
 
+    public function join($iRoomId, $cKey)
+    {
+        $nextCKey = $this->AuthModel->getNextCommuKey($cKey, $this->out);
+        list($key, $userId, $gameId, $roomId) = explode('_', $cKey);
+        $this->RoomModel->join($userId, $iRoomId, $this->out);
+        $this->AuthModel->editCommuKey($nextCKey, $iRoomId, $this->out);
+        $this->out->save("Join", true);
         $this->out->show();
     }
 
@@ -31,12 +37,8 @@ class Room extends CI_Controller
     {
         if (!($minPlayer >= 2 && $minPlayer <= $maxPlayer && $maxPlayer <= 20))
         {
-            $this->out->error("MaxPlayer = 2~20, MinPlayer <= 2 <=MaxPlayer");
-            $this->out->error("vremgkrwmkgl");
-            $this->out->error("qklnqjkewnfklewfgl");
-            return false;
+            $this->out->wrong("MaxPlayer = 2~20, MinPlayer <= 2 <=MaxPlayer");
         }
-        return true;
     }
 }
 

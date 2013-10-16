@@ -17,13 +17,21 @@ class OutputModel extends CI_Model
             $this->output[$key] = $value;
     }
 
-    public function error($value)
+    public function debug($value)
     {
-        $key = "Error";
+        $key = "DebugInfo";
         if (isset($this->output[$key]))
             $this->output[$key] .= " ; " . $value;
         else
             $this->output[$key] = $value;
+    }
+
+    // 重大錯誤 程式停止執行
+    public function wrong($value)
+    {
+        $this->save("Wrong", $value);
+        $this->show();
+        exit;
     }
 
     public function show()
