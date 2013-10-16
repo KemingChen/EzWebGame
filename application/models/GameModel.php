@@ -35,7 +35,7 @@ class GameModel extends CI_Model
         return count($result) > 0 ? $result[0]->gKey : 0;
     }
 
-    // 確認 gKey 與 game 可以 match
+    // 確認 gKey
     public function checkAuth($gKey)
     {
         $this->db->select("id, gameName");

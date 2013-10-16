@@ -33,7 +33,7 @@ class Room extends CI_Controller
         $roomId = $this->RoomModel->join($userId, $iRoomId, $this->out);
         if ($roomId != false)
         {
-            $this->RoomModel->roomInfo($gameId, $this->out, $roomId);
+            $this->RoomModel->roomInfo($this->out, $roomId);
             $this->RoomModel->playerInfo($roomId, $this->out);
         }
         $this->AuthModel->editCommuKey($nextCKey, $iRoomId, $this->out);
@@ -57,7 +57,7 @@ class Room extends CI_Controller
     {
         $nextCKey = $this->AuthModel->getNextCommuKey($cKey, $this->out);
         list($key, $userId, $gameId, $roomId) = explode('_', $cKey);
-        $this->RoomModel->roomInfo($gameId, $this->out);
+        $this->RoomModel->roomInfo($this->out);
         $this->out->show();
     }
 
@@ -96,7 +96,7 @@ class Room extends CI_Controller
     // 遊戲設定玩家人數上下限 防呆機制
     private function checkPlayerNumber($minPlayer, $maxPlayer)
     {
-        if (!($minPlayer >= 2 && $minPlayer <= $maxPlayer && $maxPlayer <= 20))
+        if (!($minPlayer >= 1 && $minPlayer <= $maxPlayer && $maxPlayer <= 20))
         {
             $this->out->wrong("MaxPlayer = 2~20, MinPlayer <= 2 <=MaxPlayer");
         }

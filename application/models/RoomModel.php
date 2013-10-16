@@ -24,6 +24,7 @@ class RoomModel extends CI_Model
         $this->db->trans_begin();
 
         $this->checkRoomCanJoin($roomId, $out);
+        
         $data = array("roomId" => $roomId, "userId" => $userId);
         $this->db->insert('room_to_user', $data);
 
@@ -59,10 +60,10 @@ class RoomModel extends CI_Model
             $this->db->trans_commit();
     }
 
-    // 房間資訊
-    public function roomInfo($gameId, $out, $roomId = false)
+    // 未開始房間資訊
+    public function roomInfo($out, $roomId = false)
     {
-        $result = $this->getRooms($gameId, $out, $roomId);
+        $result = $this->getRooms($out, $roomId);
 
         $room = array();
         foreach ($result as $row)
@@ -77,13 +78,14 @@ class RoomModel extends CI_Model
             array_push($room, $array);
         }
         $out->save("Room", $room);
+        return $room;
     }
 
     // 房間中玩家資訊
     public function playerInfo($roomId, $out)
     {
         $result = $this->getRoomPlayers($roomId);
-
+        
         $player = array();
         foreach ($result as $row)
         {
@@ -94,10 +96,11 @@ class RoomModel extends CI_Model
             array_push($player, $array);
         }
         $out->save("Player", $player);
+        return $player;
     }
 
-    // 得到房間(未處理成array物件)
-    private function getRooms($gameId, $out, $roomId)
+    // 得到未開始房間(未處理成array物件)
+    private function getRooms($out, $roomId)
     {
         $this->db->select("gameroom.id, title, min, max, count(room_to_user.id) as now");
         $this->db->from("gameroom");
@@ -113,8 +116,9 @@ class RoomModel extends CI_Model
     {
         $this->db->select("user.id, user.userName");
         $this->db->from("room_to_user");
-        $this->db->where("room_to_user.id", $roomId);
+        $this->db->where("room_to_user.roomId", $roomId);
         $this->db->join("user", "user.id = room_to_user.userId", "left");
+        $this->db->order_by("room_to_user.id", "ASC");
         return $this->db->get()->result();
     }
 
