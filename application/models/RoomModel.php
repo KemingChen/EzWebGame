@@ -24,6 +24,7 @@ class RoomModel extends CI_Model
         $this->db->trans_begin();
 
         $this->checkRoomCanJoin($roomId, $out);
+        
         $data = array("roomId" => $roomId, "userId" => $userId);
         $this->db->insert('room_to_user', $data);
 
@@ -83,7 +84,7 @@ class RoomModel extends CI_Model
     public function playerInfo($roomId, $out)
     {
         $result = $this->getRoomPlayers($roomId);
-
+        
         $player = array();
         foreach ($result as $row)
         {
@@ -113,8 +114,9 @@ class RoomModel extends CI_Model
     {
         $this->db->select("user.id, user.userName");
         $this->db->from("room_to_user");
-        $this->db->where("room_to_user.id", $roomId);
+        $this->db->where("room_to_user.roomId", $roomId);
         $this->db->join("user", "user.id = room_to_user.userId", "left");
+        $this->db->order_by("room_to_user.id", "ASC");
         return $this->db->get()->result();
     }
 
