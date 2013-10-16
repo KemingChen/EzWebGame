@@ -20,14 +20,23 @@ class RoomModel extends CI_Model
     // 加入房間
     public function join($userId, $roomId, $out)
     {
-        $this->checkUserNotInAnyRoom($userId, $out);
+        $this->checkUserNotInAnyRoom($userId, $out); // 確認玩家不要重複加入房間
         $this->db->trans_begin();
 
         $this->checkRoomCanJoin($roomId, $out);
         $data = array("roomId" => $roomId, "userId" => $userId);
         $this->db->insert('room_to_user', $data);
 
-        $this->db->trans_commit();
+        if ($this->db->trans_status() === false)
+        {
+            $this->db->trans_rollback();
+            return false;
+        }
+        else
+        {
+            $this->db->trans_commit();
+            return true;
+        }
     }
 
     // 確認此房間是否能加入
@@ -38,7 +47,7 @@ class RoomModel extends CI_Model
         $this->db->where('id', $roomId);
         $this->db->where('status', 'wait');
         $result = $this->db->get()->result();
-        
+
         if (count($result) <= 0)
         {
             $this->db->trans_rollback();

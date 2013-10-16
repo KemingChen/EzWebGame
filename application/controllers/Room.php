@@ -27,9 +27,9 @@ class Room extends CI_Controller
     {
         $nextCKey = $this->AuthModel->getNextCommuKey($cKey, $this->out);
         list($key, $userId, $gameId, $roomId) = explode('_', $cKey);
-        $this->RoomModel->join($userId, $iRoomId, $this->out);
+        $isPermit = $this->RoomModel->join($userId, $iRoomId, $this->out);
         $this->AuthModel->editCommuKey($nextCKey, $iRoomId, $this->out);
-        $this->out->save("Join", true);
+        $this->out->save("Join", $isPermit);
         $this->out->show();
     }
 
