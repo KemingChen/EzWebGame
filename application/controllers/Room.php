@@ -32,7 +32,18 @@ class Room extends CI_Controller
         $this->out->save("Join", $isPermit);
         $this->out->show();
     }
-
+    
+    // 離開房間
+    public function leave($cKey)
+    {
+        $nextCKey = $this->AuthModel->getNextCommuKey($cKey, $this->out);
+        list($key, $userId, $gameId, $roomId) = explode('_', $cKey);
+        $this->RoomModel->leave($userId, $roomId, $this->out);
+        $this->AuthModel->editCommuKey($nextCKey, 0, $this->out);
+        $this->out->save("Leave", true);
+        $this->out->show();
+    }
+    
     // 遊戲設定玩家人數上下限 防呆機制
     private function checkPlayerNumber($minPlayer, $maxPlayer)
     {

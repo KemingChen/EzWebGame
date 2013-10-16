@@ -35,10 +35,18 @@ class RoomModel extends CI_Model
         else
         {
             $this->db->trans_commit();
-            return true;
+            return $roomId;
         }
     }
-
+    
+    // 離開房間
+    public function leave($userId, $roomId, $out)
+    {
+        $this->db->where("roomId", $roomId);
+        $this->db->where("userId", $userId);
+        $this->db->delete('room_to_user'); 
+    }
+    
     // 確認此房間是否能加入
     private function checkRoomCanJoin($roomId, $out)
     {
