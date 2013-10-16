@@ -36,15 +36,15 @@ class Game extends CI_Controller
     }
 
     // 下載 EzWebGameLib
-    public function loadEzWebGameLib($gameId, $gKey)
+    public function loadEzWebGameLib($gKey)
     {
-        $auth = $this->GameModel->checkAuth($gameId, $gKey);
+        $auth = $this->GameModel->checkAuth($gKey);
         //print_r($auth);
         if ($auth != false)
         {
             $this->load->model("AuthModel");
             $this->load->model("GAuthModel");
-            $loginKey = sprintf("%s_%d", $this->AuthModel->keygen(12), $gameId);
+            $loginKey = sprintf("%s_%d", $this->AuthModel->keygen(12), $auth["id"]);
             $this->GAuthModel->saveLoginKey($loginKey);
             echo $loginKey;
         }

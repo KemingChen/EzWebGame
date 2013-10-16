@@ -36,11 +36,10 @@ class GameModel extends CI_Model
     }
 
     // 確認 gKey 與 game 可以 match
-    public function checkAuth($gameId, $gKey)
+    public function checkAuth($gKey)
     {
         $this->db->select("id, gameName");
         $this->db->from('gameinfo');
-        $this->db->where('id', $gameId);
         $this->db->where('gKey', $gKey);
         $result = $this->db->get()->result();
 

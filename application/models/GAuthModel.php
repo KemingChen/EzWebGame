@@ -18,12 +18,9 @@ class GAuthModel extends CI_Model
     }
 
     // 確認登入 Key
-    public function checkLoginKey($iGameId, $loginKey)
+    public function checkLoginKey($loginKey)
     {
         list($key, $gameId) = explode('_', $loginKey);
-
-        if ($iGameId != $gameId)
-            return false; // gameId 無法 match
 
         $this->db->select("id");
         $this->db->from('gauth');

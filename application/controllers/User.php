@@ -42,16 +42,17 @@ class User extends CI_Controller
     }
 
     // 登入
-    public function login($lKey, $gameId, $account, $password)
+    public function login($lKey, $account, $password)
     {
         $this->load->model("GAuthModel");
-        $gAuth = $this->GAuthModel->checkLoginKey($gameId, $lKey); // 確認此key可以用來登入此遊戲
+        $gAuth = $this->GAuthModel->checkLoginKey($lKey); // 確認此key可以用來登入此遊戲
         $auth = $this->UserModel->checkAuth($account, $password);
 
         if ($gAuth && $auth != false)
         {
             $this->load->model("AuthModel");
             $this->GAuthModel->deleteLoginKey($lKey); // 刪除登入時使用的Key
+            list($key, $gameId) = explode('_', $lKey);
             $nextCKey = $this->AuthModel->commuKeygen($auth["id"], $gameId, 0); // 產生 溝通key
             $this->AuthModel->saveCommuKey($auth["id"], $gameId, $nextCKey); // 儲存溝通key
             $this->out->save("cKey", $nextCKey);
