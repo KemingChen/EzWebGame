@@ -5,25 +5,20 @@ if (!defined('BASEPATH'))
 
 class PlayerStatus
 {
-    public function test()
-    {
-        echo "test!!!!";
-    }
-    
     // 創造 玩家遊戲中狀態表(PS)
     // turn( P => Playing, E => Ending, N => Now )
-    public function create($roomPlayers)
+    private function createPS($roomPlayers)
     {
         $ps = array();
         for ($i = 0; $i < count($roomPlayers); $i++)
         {
-            $ps[$i] = array($i == 0 ? "N" : "P", $roomPlayer["userId"]);
+            $ps[$i] = array($i == 0 ? "N" : "P", $roomPlayers[$i]["userId"]);
         }
         return $ps;
     }
-
+    
     // 換下一位玩家 並傳回 下一位玩家在PS中的位置
-    public function next($ps)
+    private function nextPS($ps)
     {
         for ($i = 0; $i < count($ps); $i++)
         {
@@ -38,20 +33,20 @@ class PlayerStatus
     }
 
     // 把PS轉成字串
-    public function toString($ps)
+    private function PStoString($ps)
     {
         $sPS = "";
         for ($i = 0; $i < count($ps); $i++)
         {
             if ($i != 0)
                 $sPS .= "-";
-            $sPS .= $ps[$i][0] . "&" . $ps[$i][0];
+            $sPS .= $ps[$i][0] . "&" . $ps[$i][1];
         }
         return $sPS;
     }
 
     // 把字串轉成PS
-    public function parse($sPS)
+    private function parsePS($sPS)
     {
         $ps = explode("-", $sPS);
         foreach ($ps as & $value)

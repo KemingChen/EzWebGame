@@ -96,7 +96,7 @@ class Room extends CI_Controller
     // 遊戲設定玩家人數上下限 防呆機制
     private function checkPlayerNumber($minPlayer, $maxPlayer)
     {
-        if (!($minPlayer >= 1 && $minPlayer <= $maxPlayer && $maxPlayer <= 20))
+        if (!($minPlayer >= 1 && $minPlayer <= $maxPlayer && $maxPlayer <= 10))
         {
             $this->out->wrong("MaxPlayer = 2~20, MinPlayer <= 2 <=MaxPlayer");
         }

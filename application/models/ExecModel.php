@@ -14,15 +14,28 @@ class ExecModel extends CI_Model
         $this->db->trans_begin();
         $room = $rooms->roomInfo($out, $roomId);
         $roomPlayers = $rooms->playerInfo($roomId, $out);
+
+        if (count($room) <= 0)
+        { // 房間不存在
+            $this->db->trans_rollback();
+            $out->wrong("Room isn't Exist");
+
+        }
+
         if ($room[0]["max"] >= count($roomPlayers) && $room[0]["min"] <= count($roomPlayers))
-        {
-            $ps = $this->createPS($roomPlayers);
-            print_r($ps);
-            $sPS = $this->PStoString($ps);
-            echo $sPS;
-            $data = array("status" => "start", "turn" => $sPS);
+        { // 確認房間內玩家 人數是否符合
+            if ($roomPlayers[0]["userId"] != $userId)
+            { // 確認是否為室長
+                $this->db->trans_rollback();
+                $out->wrong("Participants Cannot Open Room");
+            }
+            
+            // 寫入開房資料
+            $data = array("status" => "start", "turn" => $roomPlayers[0]["userId"],
+                "playerList" => implode("-", $roomPlayers));
             $this->db->where("id", $roomId);
             $this->db->update("gameroom", $data);
+            
             if ($this->db->trans_status() === false)
                 $this->db->trans_rollback();
             else
@@ -35,55 +48,23 @@ class ExecModel extends CI_Model
         }
     }
 
-    // 創造 玩家遊戲中狀態表(PS)
-    // turn( P => Playing, E => Ending, N => Now )
-    private function createPS($roomPlayers)
+    // 送訊息至房間中
+    public function send($message, $userId, $roomId)
     {
-        $ps = array();
-        for ($i = 0; $i < count($roomPlayers); $i++)
-        {
-            $ps[$i] = array($i == 0 ? "N" : "P", $roomPlayers[$i]["userId"]);
-        }
-        return $ps;
-    }
+        $this->db->trans_begin();
+        $this->db->select_max("count");
+        $this->db->from("command");
+        $this->db->where("roomId", $roomId);
+        $result = $this->db->get()->result();
+        $now = count($result) > 0 ? $result[0]->count + 1 : 1;
+        $data = array("roomId" => $roomId, "userId" => $userId, "timestamp" => time(),
+            "count" => $now, "order" => $message);
+        $this->db->insert("command", $data);
 
-    // 換下一位玩家 並傳回 下一位玩家在PS中的位置
-    private function nextPS($ps)
-    {
-        for ($i = 0; $i < count($ps); $i++)
-        {
-            if ($ps[$i] == "N")
-            {
-                $ps[$i] = "P";
-                $next = ($i + 1) % count($ps);
-                $ps[$next] = "N";
-                return $next;
-            }
-        }
-    }
-
-    // 把PS轉成字串
-    private function PStoString($ps)
-    {
-        $sPS = "";
-        for ($i = 0; $i < count($ps); $i++)
-        {
-            if ($i != 0)
-                $sPS .= "-";
-            $sPS .= $ps[$i][0] . "&" . $ps[$i][1];
-        }
-        return $sPS;
-    }
-
-    // 把字串轉成PS
-    private function parsePS($sPS)
-    {
-        $ps = explode("-", $sPS);
-        foreach ($ps as & $value)
-        {
-            $value = explode("&", $value);
-        }
-        return $ps;
+        if ($this->db->trans_status() === false)
+            $this->db->trans_rollback();
+        else
+            $this->db->trans_commit();
     }
 }
 

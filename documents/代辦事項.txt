@@ -1,1 +1,2 @@
 1. Developers 頁面要新增  Get Library 方式
+2. SendMessage 因為是網址傳送 會有長度限制
