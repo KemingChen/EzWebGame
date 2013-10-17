@@ -11,8 +11,8 @@ class RoomModel extends CI_Model
     // 創立房間
     public function create($gameId, $title, $minPlayer, $maxPlayer)
     {
-        $data = array('gameId' => $gameId, 'title' => $title, 'turn' => '', 'min' => $minPlayer,
-            'max' => $minPlayer, 'status' => 'wait');
+        $data = array('gameId' => $gameId, 'title' => $title, 'min' => $minPlayer,
+            'max' => $maxPlayer, 'status' => 'wait');
         $this->db->insert('gameroom', $data);
         return $this->db->insert_id();
     }
@@ -75,6 +75,7 @@ class RoomModel extends CI_Model
             $array["min"] = $row->min;
             $array["now"] = $row->now;
             $array["turn"] = $row->turn;
+            $array["list"] = $row->playingList;
 
             if ($row->id != null)
                 array_push($room, $array);
@@ -104,7 +105,7 @@ class RoomModel extends CI_Model
     // 得到未開始房間(未處理成array物件)
     private function getRooms($out, $roomId, $status)
     {
-        $this->db->select("gameroom.id, title, min, max, count(room_to_user.id) as now, turn");
+        $this->db->select("gameroom.id, title, min, max, count(room_to_user.id) as now, turn, playingList");
         $this->db->from("gameroom");
         if ($roomId != false)
             $this->db->where("gameroom.id", $roomId);
