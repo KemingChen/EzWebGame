@@ -1,3 +1,6 @@
 1. Developers 頁面要新增  Get Library 方式
 2. SendMessage 因為是網址傳送 會有長度限制
 3. Login 應該要回傳玩家資訊
+4. EzWebGame Sign up 完畢後顯示的資料不應該是JSON 格式
+5. 登出後要刪掉一些東西
+6. listRoomInfos資料只有一間 不是Array   房間資料的Now有錯誤(好像是算到有進入房間的總人數)
