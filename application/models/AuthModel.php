@@ -2,13 +2,26 @@
 
 class AuthModel extends CI_Model
 {
+    /**
+     * AuthModel::__construct()
+     * 
+     * @return void
+     */
     public function __construct()
     {
         parent::__construct();
         $this->load->database();
     }
 
-    // 確認通訊 Key 並產生下一組通訊 Key 並儲存起來
+    /**
+     * AuthModel::getNextCommuKey()
+     * 
+     * 確認通訊 Key 並產生下一組通訊 Key 並儲存起來
+     * 
+     * @param mixed $cKey
+     * @param mixed $out
+     * @return
+     */
     public function getNextCommuKey($cKey, $out)
     {
         if ($this->checkCommuKey($cKey))
@@ -22,7 +35,16 @@ class AuthModel extends CI_Model
         $out->wrong("Communication Key Deny");
     }
 
-    // 修改溝通Key中所帶房間資訊
+    /**
+     * AuthModel::editCommuKey()
+     * 
+     * 修改溝通Key中所帶房間資訊
+     * 
+     * @param mixed $cKey
+     * @param mixed $iRoomId
+     * @param mixed $out
+     * @return
+     */
     public function editCommuKey($cKey, $iRoomId, $out)
     {
         list($key, $userId, $gameId, $roomId) = explode('_', $cKey);
@@ -32,7 +54,16 @@ class AuthModel extends CI_Model
         return $nextCKey;
     }
 
-    // 通訊 Key 產生器
+    /**
+     * AuthModel::commuKeygen()
+     * 
+     * 通訊 Key 產生器
+     * 
+     * @param mixed $userId
+     * @param mixed $gameId
+     * @param mixed $roomId
+     * @return
+     */
     public function commuKeygen($userId, $gameId, $roomId)
     {
         $key = $this->keygen(10);
@@ -40,7 +71,16 @@ class AuthModel extends CI_Model
         return $cKey;
     }
 
-    // 儲存通訊 Key
+    /**
+     * AuthModel::saveCommuKey()
+     * 
+     * 儲存通訊 Key
+     * 
+     * @param mixed $userId
+     * @param mixed $gameId
+     * @param mixed $key
+     * @return void
+     */
     public function saveCommuKey($userId, $gameId, $key)
     {
         $data = array('userId' => $userId, 'gameId' => $gameId, 'key' => $key);
@@ -67,7 +107,14 @@ class AuthModel extends CI_Model
         }
     }
 
-    // 刪除通訊 Key
+    /**
+     * AuthModel::deleteCommuKey()
+     * 
+     * 刪除通訊 Key
+     * 
+     * @param mixed $cKey
+     * @return void
+     */
     public function deleteCommuKey($cKey)
     {
         list($key, $userId, $gameId, $roomId) = explode('_', $cKey);
@@ -76,7 +123,14 @@ class AuthModel extends CI_Model
         $this->db->delete('auth');
     }
 
-    // 檢查通訊 Key 是否存在
+    /**
+     * AuthModel::checkCommuKey()
+     * 
+     * 檢查通訊 Key 是否存在
+     * 
+     * @param mixed $cKey
+     * @return
+     */
     public function checkCommuKey($cKey)
     {
         list($key, $userId, $gameId, $roomId) = explode('_', $cKey);
@@ -86,11 +140,18 @@ class AuthModel extends CI_Model
         $this->db->where('gameId', $gameId);
         $this->db->where('key', $cKey);
         $result = $this->db->get()->result();
-        
+
         return count($result) > 0 ? true : false;
     }
 
-    // 金鑰產生器
+    /**
+     * AuthModel::keygen()
+     * 
+     * 金鑰產生器
+     * 
+     * @param mixed $length
+     * @return
+     */
     public function keygen($length)
     {
         $key = '';

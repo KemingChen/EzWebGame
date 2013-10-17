@@ -2,22 +2,46 @@
 
 class RoomModel extends CI_Model
 {
+    /**
+     * RoomModel::__construct()
+     * 
+     * @return void
+     */
     public function __construct()
     {
         parent::__construct();
         $this->load->database();
     }
 
-    // 創立房間
+    /**
+     * RoomModel::create()
+     * 
+     * 創立房間
+     * 
+     * @param mixed $gameId
+     * @param mixed $title
+     * @param mixed $minPlayer
+     * @param mixed $maxPlayer
+     * @return
+     */
     public function create($gameId, $title, $minPlayer, $maxPlayer)
     {
-        $data = array('gameId' => $gameId, 'title' => $title, 'min' => $minPlayer,
-            'max' => $maxPlayer, 'status' => 'wait');
+        $data = array('gameId' => $gameId, 'title' => $title, 'min' => $minPlayer, 'max' =>
+            $maxPlayer, 'status' => 'wait');
         $this->db->insert('gameroom', $data);
         return $this->db->insert_id();
     }
 
-    // 加入房間
+    /**
+     * RoomModel::join()
+     * 
+     * 加入房間
+     * 
+     * @param mixed $userId
+     * @param mixed $roomId
+     * @param mixed $out
+     * @return
+     */
     public function join($userId, $roomId, $out)
     {
         $this->checkUserNotInAnyRoom($userId, $out); // 確認玩家不要重複加入房間
@@ -40,7 +64,16 @@ class RoomModel extends CI_Model
         }
     }
 
-    // 離開房間
+    /**
+     * RoomModel::leave()
+     * 
+     * 離開房間
+     * 
+     * @param mixed $userId
+     * @param mixed $roomId
+     * @param mixed $out
+     * @return void
+     */
     public function leave($userId, $roomId, $out)
     {
         $this->db->where("roomId", $roomId);
@@ -60,10 +93,20 @@ class RoomModel extends CI_Model
             $this->db->trans_commit();
     }
 
-    // 未開始房間資訊
+    /**
+     * RoomModel::roomInfo()
+     * 
+     * 未開始房間資訊
+     * 
+     * @param mixed $out
+     * @param bool $roomId
+     * @param string $status
+     * @return
+     */
     public function roomInfo($out, $roomId = false, $status = "wait")
     {
         $result = $this->getRooms($out, $roomId, $status);
+
         $room = array();
         foreach ($result as $row)
         {
@@ -83,7 +126,15 @@ class RoomModel extends CI_Model
         return $room;
     }
 
-    // 房間中玩家資訊
+    /**
+     * RoomModel::playerInfo()
+     * 
+     * 房間中玩家資訊
+     * 
+     * @param mixed $roomId
+     * @param mixed $out
+     * @return
+     */
     public function playerInfo($roomId, $out)
     {
         $result = $this->getRoomPlayers($roomId);
@@ -101,12 +152,22 @@ class RoomModel extends CI_Model
         return $player;
     }
 
-    // 得到未開始房間(未處理成array物件)
+    /**
+     * RoomModel::getRooms()
+     * 
+     * 得到未開始房間(未處理成array物件)
+     * 
+     * @param mixed $out
+     * @param mixed $roomId
+     * @param mixed $status
+     * @return
+     */
     private function getRooms($out, $roomId, $status)
     {
         // 各房間中有多少人的 Table(RoomId, NowPlayers)
-        $RoomPlayerCountTable = "(SELECT roomId, count(userId) AS now from room_to_user GROUP BY roomId) AS RPCT";
-        
+        $RoomPlayerCountTable =
+            "(SELECT roomId, count(userId) AS now from room_to_user GROUP BY roomId) AS RPCT";
+
         $this->db->select("gameroom.id, title, min, max, turn, now, playingList");
         $this->db->from("gameroom");
         if ($roomId != false)
@@ -116,7 +177,14 @@ class RoomModel extends CI_Model
         return $this->db->get()->result();
     }
 
-    // 得到房間中玩家資訊(未處理成array物件)
+    /**
+     * RoomModel::getRoomPlayers()
+     * 
+     * 得到房間中玩家資訊(未處理成array物件)
+     * 
+     * @param mixed $roomId
+     * @return
+     */
     private function getRoomPlayers($roomId)
     {
         $this->db->select("user.id, user.userName");
@@ -127,14 +195,30 @@ class RoomModel extends CI_Model
         return $this->db->get()->result();
     }
 
-    // 修改房間資訊
+    /**
+     * RoomModel::modify()
+     * 
+     * 修改房間資訊
+     * 
+     * @param mixed $roomId
+     * @param mixed $data
+     * @return void
+     */
     public function modify($roomId, $data)
     {
         $this->db->where("id", $roomId);
         $this->db->update('gameroom', $data);
     }
 
-    // 確認此房間是否能加入
+    /**
+     * RoomModel::checkRoomCanJoin()
+     * 
+     * 確認此房間是否能加入
+     * 
+     * @param mixed $roomId
+     * @param mixed $out
+     * @return void
+     */
     public function checkRoomCanJoin($roomId, $out)
     {
         $this->db->select("max");
@@ -162,7 +246,15 @@ class RoomModel extends CI_Model
         }
     }
 
-    // 確認玩家有無在其他房間內
+    /**
+     * RoomModel::checkUserNotInAnyRoom()
+     * 
+     * 確認玩家有無在其他房間內
+     * 
+     * @param mixed $userId
+     * @param mixed $out
+     * @return void
+     */
     public function checkUserNotInAnyRoom($userId, $out)
     {
         $this->db->select("roomId");

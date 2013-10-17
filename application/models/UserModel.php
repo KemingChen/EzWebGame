@@ -2,13 +2,27 @@
 
 class UserModel extends CI_Model
 {
+    /**
+     * UserModel::__construct()
+     * 
+     * @return void
+     */
     public function __construct()
     {
         parent::__construct();
         $this->load->database();
     }
 
-    // 創建使用者
+    /**
+     * UserModel::create()
+     * 
+     * 創建使用者
+     * 
+     * @param mixed $name
+     * @param mixed $account
+     * @param mixed $password
+     * @return
+     */
     public function create($name, $account, $password)
     {
         $data = array('userName' => $name, 'account' => $account, 'password' => $password);
@@ -16,7 +30,15 @@ class UserModel extends CI_Model
         return $this->db->insert_id();
     }
 
-    // 確認某欄資料在 user資料表 中是否存在
+    /**
+     * UserModel::exist()
+     * 
+     * 確認某欄資料在 user資料表 中是否存在
+     * 
+     * @param mixed $field
+     * @param mixed $value
+     * @return
+     */
     public function exist($field, $value)
     {
         $this->db->select($field);
@@ -25,7 +47,15 @@ class UserModel extends CI_Model
         return $this->db->count_all_results() > 0;
     }
 
-    // 確認使用者帳號密碼
+    /**
+     * UserModel::checkAuth()
+     * 
+     * 確認使用者帳號密碼
+     * 
+     * @param mixed $account
+     * @param mixed $password
+     * @return
+     */
     public function checkAuth($account, $password)
     {
         $this->db->select("id, userName");

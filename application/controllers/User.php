@@ -2,6 +2,11 @@
 
 class User extends CI_Controller
 {
+    /**
+     * User::__construct()
+     * 
+     * @return void
+     */
     public function __construct()
     {
         parent::__construct();
@@ -9,7 +14,16 @@ class User extends CI_Controller
         $this->load->model("UserModel");
     }
 
-    // 創建使用者帳號密碼
+    /**
+     * User::signup()
+     * 
+     * 創建使用者帳號密碼
+     * 
+     * @param mixed $name
+     * @param mixed $account
+     * @param mixed $password
+     * @return void
+     */
     public function signup($name, $account, $password)
     {
         if (!$this->UserModel->exist("account", $account) && !$this->UserModel->exist("userName",
@@ -25,7 +39,14 @@ class User extends CI_Controller
         $this->out->show();
     }
 
-    // 確認名字是否存在
+    /**
+     * User::isNameExist()
+     * 
+     * 確認名字是否存在
+     * 
+     * @param mixed $name
+     * @return void
+     */
     public function isNameExist($name)
     {
         $isExist = $this->UserModel->exist("userName", $name);
@@ -33,7 +54,14 @@ class User extends CI_Controller
         $this->out->show();
     }
 
-    // 確認此帳號是否存在
+    /**
+     * User::isAccountExist()
+     * 
+     * 確認此帳號是否存在
+     * 
+     * @param mixed $account
+     * @return void
+     */
     public function isAccountExist($account)
     {
         $isExist = $this->UserModel->exist("account", $account);
@@ -41,7 +69,16 @@ class User extends CI_Controller
         $this->out->show();
     }
 
-    // 登入
+    /**
+     * User::login()
+     * 
+     * 登入
+     * 
+     * @param mixed $lKey
+     * @param mixed $account
+     * @param mixed $password
+     * @return void
+     */
     public function login($lKey, $account, $password)
     {
         $this->load->model("GAuthModel");
@@ -64,7 +101,14 @@ class User extends CI_Controller
         $this->out->show();
     }
 
-    // 登出
+    /**
+     * User::logout()
+     * 
+     * 登出
+     * 
+     * @param mixed $ckey
+     * @return void
+     */
     public function logout($ckey)
     {
         $this->load->model("AuthModel");

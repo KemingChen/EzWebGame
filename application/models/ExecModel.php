@@ -137,7 +137,7 @@ class ExecModel extends CI_Model
             //if ()
             if ($player == $userId)
             {
-                
+
             }
         }
     }

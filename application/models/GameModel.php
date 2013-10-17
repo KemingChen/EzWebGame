@@ -2,13 +2,27 @@
 
 class GameModel extends CI_Model
 {
+    /**
+     * GameModel::__construct()
+     * 
+     * @return void
+     */
     public function __construct()
     {
         parent::__construct();
         $this->load->database();
     }
 
-    // 創建遊戲
+    /**
+     * GameModel::create()
+     * 
+     * 創建遊戲
+     * 
+     * @param mixed $name
+     * @param mixed $gKey
+     * @param mixed $password
+     * @return
+     */
     public function create($name, $gKey, $password)
     {
         $data = array('gameName' => $name, 'gKey' => $gKey, 'password' => $password);
@@ -16,7 +30,15 @@ class GameModel extends CI_Model
         return $gKey;
     }
 
-    // 確認某欄資料在 user資料表 中是否存在
+    /**
+     * GameModel::exist()
+     * 
+     * 確認某欄資料在 user資料表 中是否存在
+     * 
+     * @param mixed $field
+     * @param mixed $value
+     * @return
+     */
     public function exist($field, $value)
     {
         $this->db->select($field);
@@ -25,6 +47,15 @@ class GameModel extends CI_Model
         return $this->db->count_all_results() > 0;
     }
 
+    /**
+     * GameModel::getGameKey()
+     * 
+     * 使用遊戲名稱 跟 開發者密碼 得到gKey
+     * 
+     * @param mixed $name
+     * @param mixed $password
+     * @return
+     */
     public function getGameKey($name, $password)
     {
         $this->db->select("gKey");
@@ -35,7 +66,14 @@ class GameModel extends CI_Model
         return count($result) > 0 ? $result[0]->gKey : 0;
     }
 
-    // 確認 gKey
+    /**
+     * GameModel::checkAuth()
+     * 
+     * 確認 gKey
+     * 
+     * @param mixed $gKey
+     * @return
+     */
     public function checkAuth($gKey)
     {
         $this->db->select("id, gameName");

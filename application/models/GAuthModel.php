@@ -2,13 +2,25 @@
 
 class GAuthModel extends CI_Model
 {
+    /**
+     * GAuthModel::__construct()
+     * 
+     * @return void
+     */
     public function __construct()
     {
         parent::__construct();
         $this->load->database();
     }
-    
-    // 儲存登入 Key
+
+    /**
+     * GAuthModel::saveLoginKey()
+     * 
+     * 儲存登入 Key
+     * 
+     * @param mixed $loginKey
+     * @return void
+     */
     public function saveLoginKey($loginKey)
     {
         list($key, $gameId) = explode('_', $loginKey);
@@ -17,7 +29,14 @@ class GAuthModel extends CI_Model
         $this->db->insert('gauth', $data);
     }
 
-    // 確認登入 Key
+    /**
+     * GAuthModel::checkLoginKey()
+     * 
+     * 確認登入 Key
+     * 
+     * @param mixed $loginKey
+     * @return
+     */
     public function checkLoginKey($loginKey)
     {
         list($key, $gameId) = explode('_', $loginKey);
@@ -31,7 +50,14 @@ class GAuthModel extends CI_Model
         return count($result) > 0 ? true : false;
     }
 
-    // 刪除登入 Key
+    /**
+     * GAuthModel::deleteLoginKey()
+     * 
+     * 刪除登入 Key
+     * 
+     * @param mixed $loginKey
+     * @return void
+     */
     public function deleteLoginKey($loginKey)
     {
         list($key, $gameId) = explode('_', $loginKey);

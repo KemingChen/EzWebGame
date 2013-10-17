@@ -2,20 +2,33 @@
 
 class Game extends CI_Controller
 {
+    /**
+     * Game::__construct()
+     * 
+     * @return void
+     */
     public function __construct()
     {
         parent::__construct();
         $this->load->model("GameModel");
     }
 
-    // 創建遊戲
+    /**
+     * Game::create()
+     * 
+     * 創建遊戲
+     * 
+     * @param mixed $name
+     * @param mixed $password
+     * @return void
+     */
     public function create($name, $password)
     {
         if (!$this->isNameExist($name))
         {
             $this->load->model("AuthModel");
             $gKey = $this->AuthModel->keygen(18);
-            echo 'Your Key is<br>'.$this->GameModel->create($name, $gKey, $password);
+            echo 'Your Key is<br>' . $this->GameModel->create($name, $gKey, $password);
         }
         else
         {
@@ -23,23 +36,45 @@ class Game extends CI_Controller
         }
     }
 
-    // 此遊戲名稱是否存在
+    /**
+     * Game::isNameExist()
+     * 
+     * 此遊戲名稱是否存在
+     * 
+     * @param mixed $name
+     * @return
+     */
     public function isNameExist($name)
     {
         return $this->GameModel->exist("gameName", $name);
     }
-    
-    // 得到 gKey
+
+    /**
+     * Game::getGameKey()
+     * 
+     * 得到 gKey
+     * 
+     * @param mixed $name
+     * @param mixed $password
+     * @return void
+     */
     public function getGameKey($name, $password)
     {
         $gKey = $this->GameModel->getGameKey($name, $password);
-        if($gKey=='0')
+        if ($gKey == '0')
             echo 'Incorrect Name or Password';
         else
-            echo 'Your Key is<br>'.$gKey;
+            echo 'Your Key is<br>' . $gKey;
     }
 
-    // 下載 EzWebGameLib
+    /**
+     * Game::loadEzWebGameLib()
+     * 
+     * 下載 EzWebGameLib
+     * 
+     * @param mixed $gKey
+     * @return void
+     */
     public function loadEzWebGameLib($gKey)
     {
         $auth = $this->GameModel->checkAuth($gKey);
