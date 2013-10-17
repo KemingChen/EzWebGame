@@ -24,7 +24,7 @@ class RoomModel extends CI_Model
         $this->db->trans_begin();
 
         $this->checkRoomCanJoin($roomId, $out);
-        
+
         $data = array("roomId" => $roomId, "userId" => $userId);
         $this->db->insert('room_to_user', $data);
 
@@ -53,7 +53,7 @@ class RoomModel extends CI_Model
             $this->db->where("id", $roomId);
             $this->db->delete("gameroom");
         }
-        
+
         if ($this->db->trans_status() === false)
             $this->db->trans_rollback();
         else
@@ -61,10 +61,10 @@ class RoomModel extends CI_Model
     }
 
     // 未開始房間資訊
-    public function roomInfo($out, $roomId = false)
+    public function roomInfo($out, $roomId = false, $status = "wait")
     {
-        $result = $this->getRooms($out, $roomId);
-        
+        $result = $this->getRooms($out, $roomId, $status);
+
         $room = array();
         foreach ($result as $row)
         {
@@ -74,8 +74,9 @@ class RoomModel extends CI_Model
             $array["max"] = $row->max;
             $array["min"] = $row->min;
             $array["now"] = $row->now;
-            
-            if($row->id != null)
+            $array["turn"] = $row->turn;
+
+            if ($row->id != null)
                 array_push($room, $array);
         }
         $out->save("Room", $room);
@@ -86,7 +87,7 @@ class RoomModel extends CI_Model
     public function playerInfo($roomId, $out)
     {
         $result = $this->getRoomPlayers($roomId);
-        
+
         $player = array();
         foreach ($result as $row)
         {
@@ -101,13 +102,13 @@ class RoomModel extends CI_Model
     }
 
     // 得到未開始房間(未處理成array物件)
-    private function getRooms($out, $roomId)
+    private function getRooms($out, $roomId, $status)
     {
-        $this->db->select("gameroom.id, title, min, max, count(room_to_user.id) as now");
+        $this->db->select("gameroom.id, title, min, max, count(room_to_user.id) as now, turn");
         $this->db->from("gameroom");
         if ($roomId != false)
             $this->db->where("gameroom.id", $roomId);
-        $this->db->where("status", "wait");
+        $this->db->where("status", $status);
         $this->db->join("room_to_user", "gameroom.id = room_to_user.roomId", "left");
         return $this->db->get()->result();
     }
