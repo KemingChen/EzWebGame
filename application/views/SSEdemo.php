@@ -32,7 +32,13 @@ function init() {
         var str = '';  
         str += '<li>[' + new Date() + ']: ';  
         str += event.data + '</li>\n';
-        document.getElementById('msg1').innerHTML += str;  
+        document.getElementById('msg1').innerHTML += str;
+        console.log(event.data);
+        if(event.data=='finish')
+        {
+            alert('close');
+            event.target.close();
+        }  
     };
 }
 </script>  

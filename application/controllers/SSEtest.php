@@ -18,6 +18,8 @@ class SSEtest extends CI_Controller
             flush();
             sleep(1);
         }
+        echo 'data: ' . "finish"."\n\n";
+        flush();
     }
 }
 
