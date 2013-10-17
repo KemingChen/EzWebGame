@@ -64,7 +64,6 @@ class RoomModel extends CI_Model
     public function roomInfo($out, $roomId = false, $status = "wait")
     {
         $result = $this->getRooms($out, $roomId, $status);
-        
         $room = array();
         foreach ($result as $row)
         {
