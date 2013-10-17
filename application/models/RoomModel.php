@@ -64,7 +64,7 @@ class RoomModel extends CI_Model
     public function roomInfo($out, $roomId = false, $status = "wait")
     {
         $result = $this->getRooms($out, $roomId, $status);
-
+        echo $this->db->last_query();
         $room = array();
         foreach ($result as $row)
         {
@@ -105,12 +105,15 @@ class RoomModel extends CI_Model
     // 得到未開始房間(未處理成array物件)
     private function getRooms($out, $roomId, $status)
     {
-        $this->db->select("gameroom.id, title, min, max, count(room_to_user.id) as now, turn, playingList");
+        // 各房間中有多少人的 Table(RoomId, NowPlayers)
+        $RoomPlayerCountTable = "(SELECT roomId, count(userId) AS now from room_to_user GROUP BY roomId) AS RPCT";
+        
+        $this->db->select("gameroom.id, title, min, max, turn, now, playingList");
         $this->db->from("gameroom");
         if ($roomId != false)
             $this->db->where("gameroom.id", $roomId);
         $this->db->where("status", $status);
-        $this->db->join("room_to_user", "gameroom.id = room_to_user.roomId", "left");
+        $this->db->join($RoomPlayerCountTable, "gameroom.id = RPCT.roomId", "left");
         return $this->db->get()->result();
     }
 
