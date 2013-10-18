@@ -88,25 +88,25 @@ class ExecModel extends CI_Model
      * 
      * @param mixed $message
      * @param mixed $userId
-     * @param mixed $roomId
+     * @param mixed $roomInfos
      * @return void
      */
-    public function send($message, $userId, $roomId)
+    public function send($message, $userId, $roomId, $roomPlayers)
     {
-        $this->db->trans_begin();
-        $this->db->select_max("count");
-        $this->db->from("command");
-        $this->db->where("roomId", $roomId);
-        $result = $this->db->get()->result();
-        $now = count($result) > 0 ? $result[0]->count + 1 : 1;
-        $data = array("roomId" => $roomId, "userId" => $userId, "timestamp" => time(),
-            "count" => $now, "order" => $message);
-        $this->db->insert("command", $data);
-
-        if ($this->db->trans_status() === false)
-            $this->db->trans_rollback();
-        else
-            $this->db->trans_commit();
+        $insertDatas = array();
+        foreach ($roomPlayers as $roomPlayer)
+        {
+            if ($roomPlayer["userId"] != $userId)
+            {
+                $data = array();
+                $data["type"] = "message";
+                $data["receiverId"] = $roomPlayer["userId"];
+                $data["roomId"] = $roomId;
+                $data["param"] = $message;
+                array_push($insertDatas, $data);
+            }
+        }
+        $this->db->insert_batch("event", $insertDatas);
     }
 
     /**
@@ -150,12 +150,12 @@ class ExecModel extends CI_Model
                 break;
             }
         }
-        
+
         // 更新資料庫
-        $data = array("turn"=>$nextPlayer);
+        $data = array("turn" => $nextPlayer);
         $this->db->where("id", $roomInfo["id"]);
         $this->db->update("gameroom", $data);
-        
+
         return $nextPlayer;
     }
 }

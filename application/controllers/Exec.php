@@ -50,7 +50,8 @@ class Exec extends CI_Controller
         // 確認現在是輪到自己送訊息
         if ($roomInfos[0]["turn"] == $userId)
         {
-            $this->ExecModel->send($message, $userId, $roomId);
+            $roomPlayers = $this->room->playerInfo($roomId, $this->out);
+            $this->ExecModel->send($message, $userId, $roomId, $roomPlayers);
             $this->out->save("Message", $message);
         }
         else
