@@ -41,26 +41,15 @@ class Exec extends CI_Controller
     {
         $nextCKey = $this->AuthModel->getNextCommuKey($cKey, $this->out);
         list($key, $userId, $gameId, $roomId) = explode('_', $cKey);
-        
-        // 確認房間
-        $this->load->model("RoomModel", "room");
-        $roomInfos = $this->room->roomInfo($this->out, $roomId, "start");
-        $this->ExecModel->checkRoomIsStart($roomInfos, $this->out);
 
-        // 確認現在是輪到自己送訊息
-        if ($roomInfos[0]["turn"] == $userId)
-        {
-            $this->ExecModel->send($message, $userId, $roomId);
-            $this->out->save("Message", $message);
-        }
-        else
-        {
-            $this->out->wrong("Game isn't turn me");
-        }
+        $roomInfo = $this->checkRoomExistAndIsTurnMe($userId, $roomId);
+        $roomPlayers = $this->room->playerInfo($roomId, $this->out);
+        $this->ExecModel->send("message", $message, $userId, $roomId, $roomPlayers);
+        $this->out->save("Message", $message);
 
         $this->out->show();
     }
-    
+
     /**
      * Exec::nextRound()
      * 
@@ -69,27 +58,61 @@ class Exec extends CI_Controller
      */
     public function nextRound($cKey)
     {
-        //$nextCKey = $this->AuthModel->getNextCommuKey($cKey, $this->out);
+        $nextCKey = $this->AuthModel->getNextCommuKey($cKey, $this->out);
+        list($key, $userId, $gameId, $roomId) = explode('_', $cKey);
+
+        $roomInfo = $this->checkRoomExistAndIsTurnMe($userId, $roomId);
+        $playerId = $this->ExecModel->next($roomInfo, $userId, $roomId);
+        $this->out->save("NextRound", $playerId);
+
+        $this->out->show();
+    }
+    
+    /**
+     * Exec::ArriveFinalStep()
+     * 
+     * 告訴其他玩家 你已經獲勝 並把自己從回合控制器中移除
+     * 
+     * @param mixed $cKey
+     * @return void
+     */
+    public function ArriveFinalStep($cKey)
+    {
+        $nextCKey = $this->AuthModel->getNextCommuKey($cKey, $this->out);
         list($key, $userId, $gameId, $roomId) = explode('_', $cKey);
         
+        $roomInfo = $this->checkRoomExistAndIsTurnMe($userId, $roomId);
+        $this->ExecModel->next($roomInfo, $userId, $roomId);
+        $this->ExecModel->removeFromPlayingList($userId, $roomInfo);
+        $this->out->save("ArriveFinalStep", true);
+
+        $this->out->show();
+    }
+    
+    /**
+     * Exec::checkRoomExistAndIsTurnMe()
+     * 
+     * @param mixed $userId
+     * @param mixed $roomId
+     * @return 傳回目前房間資訊
+     */
+    private function checkRoomExistAndIsTurnMe($userId, $roomId)
+    {
         // 確認房間
         $this->load->model("RoomModel", "room");
-        $roomInfos = $this->room->roomInfo($out, $roomId, "start");
+        $roomInfos = $this->room->roomInfo($this->out, $roomId, "start");
+        $this->out->delete("Room"); // 刪除儲存在out中的Room Key
         $this->ExecModel->checkRoomIsStart($roomInfos, $this->out);
-        
+
         // 確認現在是輪到自己送訊息
         if ($roomInfos[0]["turn"] == $userId)
         {
-            $playerInfo = $this->room->playerInfo($roomId, $out);
-            $playerId = $this->ExecModel->next($playerInfo, $roomInfos, $userId, $roomId);
-            $this->out->save("NextRound", $playerId);
+            return $roomInfos[0];
         }
         else
         {
             $this->out->wrong("Game isn't turn me");
         }
-
-        $this->out->show();
     }
 }
 

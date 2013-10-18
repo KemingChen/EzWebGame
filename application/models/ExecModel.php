@@ -84,29 +84,30 @@ class ExecModel extends CI_Model
     /**
      * ExecModel::send()
      * 
-     * 送訊息至房間中
+     * 送事件至房間中的其他玩家
      * 
      * @param mixed $message
-     * @param mixed $userId
+     * @param mixed $senderId
      * @param mixed $roomId
+     * @param mixed $roomPlayers
      * @return void
      */
-    public function send($message, $userId, $roomId)
+    public function send($type, $param, $senderId, $roomId, $roomPlayers)
     {
-        $this->db->trans_begin();
-        $this->db->select_max("count");
-        $this->db->from("command");
-        $this->db->where("roomId", $roomId);
-        $result = $this->db->get()->result();
-        $now = count($result) > 0 ? $result[0]->count + 1 : 1;
-        $data = array("roomId" => $roomId, "userId" => $userId, "timestamp" => time(),
-            "count" => $now, "order" => $message);
-        $this->db->insert("command", $data);
-
-        if ($this->db->trans_status() === false)
-            $this->db->trans_rollback();
-        else
-            $this->db->trans_commit();
+        $insertDatas = array();
+        foreach ($roomPlayers as $roomPlayer)
+        {
+            if ($roomPlayer["userId"] != $senderId)
+            {
+                $data = array();
+                $data["type"] = $type;
+                $data["receiverId"] = $roomPlayer["userId"];
+                $data["roomId"] = $roomId;
+                $data["param"] = $param;
+                array_push($insertDatas, $data);
+            }
+        }
+        $this->db->insert_batch("event", $insertDatas);
     }
 
     /**
@@ -114,8 +115,7 @@ class ExecModel extends CI_Model
      * 
      * 確保此房間是 遊戲中 且存在
      * 
-     * @param mixed $room
-     * @param mixed $roomId
+     * @param mixed $roomInfos
      * @param mixed $out
      * @return void
      */
@@ -127,19 +127,62 @@ class ExecModel extends CI_Model
         }
     }
 
-    public function next($playerInfos, $roomInfos, $userId, $out)
+    /**
+     * ExecModel::next()
+     * 
+     * 把回合控制器中的 turn 轉到下一位玩家
+     * 
+     * @param mixed $roomInfos
+     * @param mixed $userId
+     * @param mixed $out
+     * @return
+     */
+    public function next($roomInfo, $userId, $out)
     {
-        $roomInfo = $roomInfos[0];
+        // 計算下一位玩家
         $turn = $roomInfo["turn"];
         $list = explode("-", $roomInfo["list"]);
-        foreach ($list as $player)
+        for ($i = 0; $i < count($list); $i++)
         {
-            //if ()
-            if ($player == $userId)
+            if ($list[$i] == $userId)
             {
-
+                $nextPlayer = $list[($i + 1) % count($list)];
+                break;
             }
         }
+
+        // 更新資料庫
+        $data = array("turn" => $nextPlayer);
+        $this->db->where("id", $roomInfo["id"]);
+        $this->db->update("gameroom", $data);
+
+        return $nextPlayer;
+    }
+
+    /**
+     * ExecModel::removeFromPlayingList()
+     * 
+     * 把自己從回合控制器中移除
+     * 
+     * @param mixed $userId
+     * @param mixed $roomInfo
+     * @return void
+     */
+    public function removeFromPlayingList($userId, $roomInfo)
+    {
+        $roomId = $roomInfo["id"];
+        $list = explode("-", $roomInfo["list"]);
+        for ($i = 0; $i < count($list); $i++)
+        {
+            if ($list[$i] == $userId)
+            {
+                unset($list[$i]);
+                break;
+            }
+        }
+        $data = array("playingList" => implode("-", $list));
+        $this->db->where("id", $roomId);
+        $this->db->update("gameroom", $data);
     }
 }
 
