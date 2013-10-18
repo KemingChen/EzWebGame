@@ -84,11 +84,12 @@ class ExecModel extends CI_Model
     /**
      * ExecModel::send()
      * 
-     * 送訊息至房間中
+     * 送訊息至房間中的其他玩家
      * 
      * @param mixed $message
      * @param mixed $userId
-     * @param mixed $roomInfos
+     * @param mixed $roomId
+     * @param mixed $roomPlayers
      * @return void
      */
     public function send($message, $userId, $roomId, $roomPlayers)
@@ -129,17 +130,16 @@ class ExecModel extends CI_Model
     /**
      * ExecModel::next()
      * 
-     * 得到下位玩家
+     * 把回合控制器中的 turn 轉到下一位玩家
      * 
      * @param mixed $roomInfos
      * @param mixed $userId
      * @param mixed $out
      * @return
      */
-    public function next($roomInfos, $userId, $out)
+    public function next($roomInfo, $userId, $out)
     {
         // 計算下一位玩家
-        $roomInfo = $roomInfos[0];
         $turn = $roomInfo["turn"];
         $list = explode("-", $roomInfo["list"]);
         for ($i = 0; $i < count($list); $i++)
