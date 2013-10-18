@@ -44,7 +44,7 @@ class Exec extends CI_Controller
 
         $roomInfo = $this->checkRoomExistAndIsTurnMe($userId, $roomId);
         $roomPlayers = $this->room->playerInfo($roomId, $this->out);
-        $this->ExecModel->send($message, $userId, $roomId, $roomPlayers);
+        $this->ExecModel->send("message", $message, $userId, $roomId, $roomPlayers);
         $this->out->save("Message", $message);
 
         $this->out->show();
@@ -67,7 +67,28 @@ class Exec extends CI_Controller
 
         $this->out->show();
     }
+    
+    /**
+     * Exec::ArriveFinalStep()
+     * 
+     * 告訴其他玩家 你已經獲勝 並把自己從回合控制器中移除
+     * 
+     * @param mixed $cKey
+     * @return void
+     */
+    public function ArriveFinalStep($cKey)
+    {
+        $nextCKey = $this->AuthModel->getNextCommuKey($cKey, $this->out);
+        list($key, $userId, $gameId, $roomId) = explode('_', $cKey);
+        
+        $roomInfo = $this->checkRoomExistAndIsTurnMe($userId, $roomId);
+        $this->ExecModel->next($roomInfo, $userId, $roomId);
+        $this->ExecModel->removeFromPlayingList($userId, $roomInfo);
+        $this->out->save("ArriveFinalStep", true);
 
+        $this->out->show();
+    }
+    
     /**
      * Exec::checkRoomExistAndIsTurnMe()
      * 

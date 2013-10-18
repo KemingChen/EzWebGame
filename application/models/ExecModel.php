@@ -84,7 +84,7 @@ class ExecModel extends CI_Model
     /**
      * ExecModel::send()
      * 
-     * 送訊息至房間中的其他玩家
+     * 送事件至房間中的其他玩家
      * 
      * @param mixed $message
      * @param mixed $userId
@@ -92,7 +92,7 @@ class ExecModel extends CI_Model
      * @param mixed $roomPlayers
      * @return void
      */
-    public function send($message, $userId, $roomId, $roomPlayers)
+    public function send($type, $param, $userId, $roomId, $roomPlayers)
     {
         $insertDatas = array();
         foreach ($roomPlayers as $roomPlayer)
@@ -100,10 +100,10 @@ class ExecModel extends CI_Model
             if ($roomPlayer["userId"] != $userId)
             {
                 $data = array();
-                $data["type"] = "message";
+                $data["type"] = $type;
                 $data["receiverId"] = $roomPlayer["userId"];
                 $data["roomId"] = $roomId;
-                $data["param"] = $message;
+                $data["param"] = $param;
                 array_push($insertDatas, $data);
             }
         }
@@ -157,6 +157,32 @@ class ExecModel extends CI_Model
         $this->db->update("gameroom", $data);
 
         return $nextPlayer;
+    }
+
+    /**
+     * ExecModel::removeFromPlayingList()
+     * 
+     * 把自己從回合控制器中移除
+     * 
+     * @param mixed $userId
+     * @param mixed $roomInfo
+     * @return void
+     */
+    public function removeFromPlayingList($userId, $roomInfo)
+    {
+        $roomId = $roomInfo["id"];
+        $list = explode("-", $roomInfo["list"]);
+        for ($i = 0; $i < count($list); $i++)
+        {
+            if ($list[$i] == $userId)
+            {
+                unset($list[$i]);
+                break;
+            }
+        }
+        $data = array("playingList" => implode("-", $list));
+        $this->db->where("id", $roomId);
+        $this->db->update("gameroom", $data);
     }
 }
 
