@@ -87,17 +87,17 @@ class ExecModel extends CI_Model
      * 送事件至房間中的其他玩家
      * 
      * @param mixed $message
-     * @param mixed $userId
+     * @param mixed $senderId
      * @param mixed $roomId
      * @param mixed $roomPlayers
      * @return void
      */
-    public function send($type, $param, $userId, $roomId, $roomPlayers)
+    public function send($type, $param, $senderId, $roomId, $roomPlayers)
     {
         $insertDatas = array();
         foreach ($roomPlayers as $roomPlayer)
         {
-            if ($roomPlayer["userId"] != $userId)
+            if ($roomPlayer["userId"] != $senderId)
             {
                 $data = array();
                 $data["type"] = $type;
