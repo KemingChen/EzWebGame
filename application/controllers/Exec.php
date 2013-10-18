@@ -74,14 +74,14 @@ class Exec extends CI_Controller
         
         // 確認房間
         $this->load->model("RoomModel", "room");
-        $roomInfos = $this->room->roomInfo($out, $roomId, "start");
+        $roomInfos = $this->room->roomInfo($this->out, $roomId, "start");
+        $this->out->delete("Room");// 刪除儲存在out中的Room Key
         $this->ExecModel->checkRoomIsStart($roomInfos, $this->out);
         
         // 確認現在是輪到自己送訊息
         if ($roomInfos[0]["turn"] == $userId)
         {
-            $playerInfo = $this->room->playerInfo($roomId, $out);
-            $playerId = $this->ExecModel->next($playerInfo, $roomInfos, $userId, $roomId);
+            $playerId = $this->ExecModel->next($roomInfos, $userId, $roomId);
             $this->out->save("NextRound", $playerId);
         }
         else

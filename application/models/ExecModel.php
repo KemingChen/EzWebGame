@@ -114,8 +114,7 @@ class ExecModel extends CI_Model
      * 
      * 確保此房間是 遊戲中 且存在
      * 
-     * @param mixed $room
-     * @param mixed $roomId
+     * @param mixed $roomInfos
      * @param mixed $out
      * @return void
      */
@@ -127,19 +126,37 @@ class ExecModel extends CI_Model
         }
     }
 
-    public function next($playerInfos, $roomInfos, $userId, $out)
+    /**
+     * ExecModel::next()
+     * 
+     * 得到下位玩家
+     * 
+     * @param mixed $roomInfos
+     * @param mixed $userId
+     * @param mixed $out
+     * @return
+     */
+    public function next($roomInfos, $userId, $out)
     {
+        // 計算下一位玩家
         $roomInfo = $roomInfos[0];
         $turn = $roomInfo["turn"];
         $list = explode("-", $roomInfo["list"]);
-        foreach ($list as $player)
+        for ($i = 0; $i < count($list); $i++)
         {
-            //if ()
-            if ($player == $userId)
+            if ($list[$i] == $userId)
             {
-
+                $nextPlayer = $list[($i + 1) % count($list)];
+                break;
             }
         }
+        
+        // 更新資料庫
+        $data = array("turn"=>$nextPlayer);
+        $this->db->where("id", $roomInfo["id"]);
+        $this->db->update("gameroom", $data);
+        
+        return $nextPlayer;
     }
 }
 
