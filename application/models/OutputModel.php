@@ -89,6 +89,7 @@ class OutputModel extends CI_Model
     public function show()
     {
         echo json_encode($this->output);
+        $this->output = array();
     }
 }
 

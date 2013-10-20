@@ -57,7 +57,11 @@ class Room extends CI_Controller
         if ($roomId != false)
         {
             $this->RoomModel->roomInfo($this->out, $roomId);
-            $this->RoomModel->playerInfo($roomId, $this->out);
+            $roomPlayers = $this->RoomModel->playerInfo($roomId, $this->out);
+            
+            // 告知其他玩家 自己加入房間
+            $this->load->model("ExecModel", "Exec");
+            $this->Exec->send("roomChanged", "Room has Changed", $userId, $roomId, $roomPlayers);
         }
         $this->AuthModel->editCommuKey($nextCKey, $iRoomId, $this->out);
         $this->out->save("Join", $roomId);

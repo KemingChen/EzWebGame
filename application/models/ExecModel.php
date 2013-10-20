@@ -94,20 +94,50 @@ class ExecModel extends CI_Model
      */
     public function send($type, $param, $senderId, $roomId, $roomPlayers)
     {
-        $insertDatas = array();
-        foreach ($roomPlayers as $roomPlayer)
+        if (count($roomPlayers) > 1)
         {
-            if ($roomPlayer["userId"] != $senderId)
+            $insertDatas = array();
+            foreach ($roomPlayers as $roomPlayer)
             {
-                $data = array();
-                $data["type"] = $type;
-                $data["receiverId"] = $roomPlayer["userId"];
-                $data["roomId"] = $roomId;
-                $data["param"] = $param;
-                array_push($insertDatas, $data);
+                if ($roomPlayer["userId"] != $senderId)
+                {
+                    $data = array();
+                    $data["type"] = $type;
+                    $data["receiverId"] = $roomPlayer["userId"];
+                    $data["roomId"] = $roomId;
+                    $data["param"] = $param;
+                    array_push($insertDatas, $data);
+                }
             }
+            $this->db->insert_batch("event", $insertDatas);
         }
-        $this->db->insert_batch("event", $insertDatas);
+    }
+
+    public function listen($type, $userId, $roomId)
+    {
+        $this->db->select("id, param");
+        $this->db->from("event");
+        $this->db->where("type", $type);
+        $this->db->where("receiverId", $userId);
+        $this->db->where("roomId", $roomId);
+        $this->db->order_by("id", "ASC");
+        $result = $this->db->get()->result();
+        $array = array();
+        $lastEventId = 0;
+        foreach ($result as $row)
+        {
+            array_push($array, $row->param);
+            $lastEventId = $row->id;
+        }
+
+        // §R°£¤wÅª°T®§
+        if ($lastEventId != 0)
+        {
+            $this->db->where("receiverId", $userId);
+            $this->db->where("id <=", $lastEventId);
+            $this->db->delete("event");
+        }
+        return $array;
     }
 
     /**

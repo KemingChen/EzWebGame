@@ -27,7 +27,7 @@
 </style>  
 <script>  
 function init() {  
-    var es = new EventSource('./SSEtest');
+    var es = new EventSource('./Event/Request/roomChanged/WKGS2rjMAV_15_1_4');
     es.onmessage = function (event) {
         var str = '';  
         str += '<li>[' + new Date() + ']: ';  
