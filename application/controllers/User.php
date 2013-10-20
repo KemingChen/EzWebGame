@@ -100,7 +100,21 @@ class User extends CI_Controller
         }
         $this->out->show();
     }
-
+    
+    /**
+     * User::cancelLogin()
+     * 
+     * 取消此 登入Key
+     * 
+     * @param mixed $lKey
+     * @return void
+     */
+    public function cancelLogin($lKey)
+    {
+        $this->load->model("GAuthModel");
+        $this->GAuthModel->deleteLoginKey($lKey);
+    }
+    
     /**
      * User::logout()
      * 

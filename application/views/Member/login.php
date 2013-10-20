@@ -7,6 +7,8 @@
 <input id="login" type="button" class="btn btn-primary" value="Login"/>
 
 <script>
+window.onblur = window.close;
+window.onbeforeunload = function(){$.ajax({url: "<?=base_url('/user/cancelLogin/'.$lKey)?>",})};
 (function(){
     if(opener!=null)
     {
