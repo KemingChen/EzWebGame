@@ -10,7 +10,7 @@
 window.onblur = window.close;
 window.onbeforeunload = function(){$.ajax({url: "<?=base_url('/user/cancelLogin/'.$lKey)?>",})};
 (function(){
-    if(opener!=null)
+    if(opener.EzWebGame!=null)
     {
         $("#login").click(function(){
             var account = $("#account").val();
@@ -25,18 +25,7 @@ window.onbeforeunload = function(){$.ajax({url: "<?=base_url('/user/cancelLogin/
         	}).done(function(data) {
                 window.close();
                 data = JSON.parse(data);
-                if(data.Wrong!=null)
-                {
-                    if(opener.onLoginFail)
-                        opener.onLoginFail(data.Wrong);
-                }
-                else
-                {
-                    opener.Key = data.cKey;
-                    if(opener.onLoginSuccess)
-                        opener.onLoginSuccess();
-                }
-                
+                opener.EzWebGame.cKey(data);
         	});
         });
     }
