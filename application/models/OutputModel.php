@@ -89,7 +89,22 @@ class OutputModel extends CI_Model
     public function show()
     {
         echo json_encode($this->output);
+    }
+
+    /**
+     * OutputModel::flush()
+     * 
+     * 把暫存資料以JSON格式，透過SSE輸出
+     * 
+     * @return void
+     */
+    public function flush()
+    {
+        echo "data: ";
+        $this->out->show();
+        echo "\n\n";
         $this->output = array();
+        flush();
     }
 }
 

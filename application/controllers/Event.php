@@ -10,28 +10,31 @@ class Event extends CI_Controller
         $this->load->model("AuthModel");
     }
 
-    public function request($event, $cKey)
+    public function request($cKey)
     {
-        //$nextCKey = $this->AuthModel->getNextCommuKey($cKey, $this->out);
+        $isPermit = $this->AuthModel->checkCommuKey($cKey);
+        if (!$isPermit)
+        { // 通訊Key 認證失敗
+            $this->out->wrong("No Auth Can Request");
+        }
+        
         list($key, $userId, $gameId, $roomId) = explode('_', $cKey);
 
         header("Content-Type: text/event-stream");
         header('Cache-Control: no-cache');
         if (ob_get_level())
             ob_end_flush();
-        
-        
+            
+        $this->out->save("Events", "hello");
+        $this->out->flush();
         
         while (true)
         {
-            $events = $this->ExecModel->listen("roomChanged", $userId, $roomId);
+            $events = $this->ExecModel->listen($userId, $roomId);
             if (count($events) > 0)
             {
                 $this->out->save("Events", $events);
-                echo "data: ";
-                $this->out->show();
-                echo "\n\n";
-                flush();
+                $this->out->flush();
             }
             sleep(3);
         }

@@ -113,11 +113,11 @@ class ExecModel extends CI_Model
         }
     }
 
-    public function listen($type, $userId, $roomId)
+    public function listen($userId, $roomId)
     {
-        $this->db->select("id, param");
+        $this->db->select("id, type, param");
         $this->db->from("event");
-        $this->db->where("type", $type);
+        //$this->db->where("type", $type);
         $this->db->where("receiverId", $userId);
         $this->db->where("roomId", $roomId);
         $this->db->order_by("id", "ASC");
@@ -126,7 +126,7 @@ class ExecModel extends CI_Model
         $lastEventId = 0;
         foreach ($result as $row)
         {
-            array_push($array, $row->param);
+            array_push($array, array("Type" => $row->type, "Param" => $row->param));
             $lastEventId = $row->id;
         }
 
