@@ -10,7 +10,8 @@
 window.onblur = window.close;
 window.onbeforeunload = function(){$.ajax({url: "<?=base_url('/user/cancelLogin/'.$lKey)?>",})};
 (function(){
-    if(opener.EzWebGame!=null)
+    $("#account").focus();
+    if(opener != null && opener.EzWebGame!=null)
     {
         $("#login").click(function(){
             var account = $("#account").val();

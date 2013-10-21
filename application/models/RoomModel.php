@@ -115,7 +115,7 @@ class RoomModel extends CI_Model
             $array["title"] = $row->title;
             $array["max"] = $row->max;
             $array["min"] = $row->min;
-            $array["now"] = $row->now;
+            $array["now"] = $row->now == null ? 0 : $row->now;
             $array["turn"] = $row->turn;
             $array["list"] = $row->playingList;
 
