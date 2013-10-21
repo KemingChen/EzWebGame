@@ -12,14 +12,10 @@ class Event extends CI_Controller
 
     public function request($cKey)
     {
-        $isPermit = $this->AuthModel->checkCommuKey($cKey);
-        if (!$isPermit)
-        { // 通訊Key 認證失敗
-            $this->out->wrong("No Auth Can Request");
-        }
-
+        $this->checkIsPermit($cKey);
         list($key, $userId, $gameId, $roomId) = explode('_', $cKey);
-
+        
+        $this->load->model("RoomModel", "room");
         header("Content-Type: text/event-stream");
         header('Cache-Control: no-cache');
         if (ob_get_level())
@@ -30,13 +26,31 @@ class Event extends CI_Controller
 
         while (true)
         {
-            $events = $this->ExecModel->listen($userId, $roomId);
-            if (count($events) > 0)
+            if($roomId != 0)
             {
-                $this->out->save("Events", $events);
+                $events = $this->ExecModel->listen($userId, $roomId, $this->out, $this->room);
+                if (count($events) > 0)
+                {
+                    $this->out->save("Events", $events);
+                    $this->out->flush();
+                }
+            }
+            else
+            {
+                $rooms = $this->room->roomInfo($this->out);
+                $this->out->save("Events", array(array("Type" => "RefreshRoomList", "Param" => $rooms)));
                 $this->out->flush();
             }
             sleep(3);
+        }
+    }
+    
+    private function checkIsPermit($cKey)
+    {
+        $isPermit = $this->AuthModel->checkCommuKey($cKey);
+        if (!$isPermit)
+        { // 通訊Key 認證失敗
+            $this->out->wrong("No Auth Can Request");
         }
     }
 }

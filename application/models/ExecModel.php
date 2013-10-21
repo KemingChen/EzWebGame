@@ -113,7 +113,7 @@ class ExecModel extends CI_Model
         }
     }
 
-    public function listen($userId, $roomId)
+    public function listen($userId, $roomId, $out, $roomModel)
     {
         $this->db->select("id, type, param");
         $this->db->from("event");
@@ -126,7 +126,15 @@ class ExecModel extends CI_Model
         $lastEventId = 0;
         foreach ($result as $row)
         {
-            array_push($array, array("Type" => $row->type, "Param" => $row->param));
+            switch($row->type)
+            {
+                case 'roomChanged':
+                    $param = $roomModel->ListRoomInfos($out, $roomId);
+                    break;
+                default:
+                    $param = $row->param;
+            }
+            array_push($array, array("Type" => $row->type, "Param" => $param));
             $lastEventId = $row->id;
         }
 
