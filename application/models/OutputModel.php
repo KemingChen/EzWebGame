@@ -13,7 +13,7 @@ class OutputModel extends CI_Model
     {
         parent::__construct();
     }
-
+    
     /**
      * OutputModel::delete()
      * 
