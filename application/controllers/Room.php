@@ -82,6 +82,13 @@ class Room extends CI_Controller
         list($key, $userId, $gameId, $roomId) = explode('_', $cKey);
         $this->RoomModel->leave($userId, $roomId, $this->out);
         $this->AuthModel->editCommuKey($nextCKey, 0, $this->out);
+        
+        // 告知其他玩家 自己離開房間
+        $this->load->model("ExecModel", "Exec");
+        $roomPlayers = $this->RoomModel->playerInfo($roomId, $this->out);
+        //$this->out->delete("Players");
+        $this->Exec->send("roomChanged", "Room has Changed", $userId, $roomId, $roomPlayers);
+        
         $this->out->save("Leave", true);
         $this->out->show();
     }

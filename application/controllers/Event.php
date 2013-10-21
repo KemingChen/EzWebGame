@@ -17,17 +17,17 @@ class Event extends CI_Controller
         { // 通訊Key 認證失敗
             $this->out->wrong("No Auth Can Request");
         }
-        
+
         list($key, $userId, $gameId, $roomId) = explode('_', $cKey);
 
         header("Content-Type: text/event-stream");
         header('Cache-Control: no-cache');
         if (ob_get_level())
             ob_end_flush();
-            
-        $this->out->save("Events", "hello");
+
+        $this->out->save("Events", array("Type" => "Debug", "Param" => "Hello Request"));
         $this->out->flush();
-        
+
         while (true)
         {
             $events = $this->ExecModel->listen($userId, $roomId);
