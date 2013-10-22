@@ -24,24 +24,21 @@ class ExecModel extends CI_Model
      * @param mixed $rooms
      * @return void
      */
-    public function start($userId, $roomId, $out, $rooms)
+    public function start($userId, $roomId, $out, $roomInfo, $roomPlayers)
     {
-        $this->db->trans_begin();
-        $room = $rooms->roomInfo($out, $roomId);
-        $out->delete("Room");
-        $roomPlayers = $rooms->playerInfo($roomId, $out);
+        //$this->db->trans_begin();
 
-        if (count($room) <= 0)
+        if (count($roomInfo) <= 0)
         { // 房間不存在
-            $this->db->trans_rollback();
+            //$this->db->trans_rollback();
             $out->wrong("Room isn't Exist");
         }
 
-        if ($room[0]["max"] >= count($roomPlayers) && $room[0]["min"] <= count($roomPlayers))
+        if ($roomInfo[0]["max"] >= count($roomPlayers) && $roomInfo[0]["min"] <= count($roomPlayers))
         { // 確認房間內玩家 人數是否符合
             if ($roomPlayers[0]["userId"] != $userId)
             { // 確認是否為室長
-                $this->db->trans_rollback();
+                //$this->db->trans_rollback();
                 $out->wrong("Participants Cannot Open Room");
             }
 
@@ -51,14 +48,16 @@ class ExecModel extends CI_Model
             $this->db->where("id", $roomId);
             $this->db->update("gameroom", $data);
 
-            if ($this->db->trans_status() === false)
-                $this->db->trans_rollback();
+            /*if ($this->db->trans_status() === false)
+            $this->db->trans_rollback();
             else
-                $this->db->trans_commit();
+            $this->db->trans_commit();*/
+
+            return $roomPlayers[0];
         }
         else
         {
-            $this->db->trans_rollback();
+            //$this->db->trans_rollback();
             $out->wrong("Opening Room Standard is Not Satisfied");
         }
     }
@@ -92,13 +91,13 @@ class ExecModel extends CI_Model
      * @param mixed $roomPlayers
      * @return void
      */
-    public function send($type, $param, $senderId, $roomId, $roomPlayers)
+    public function send($type, $param, $senderId, $roomId, $roomPlayers, $isIncludeSelf = false)
     {
         $insertDatas = array();
         $insertLogs = array();
         foreach ($roomPlayers as $roomPlayer)
         {
-            if ($roomPlayer["userId"] != $senderId)
+            if ($roomPlayer["userId"] != $senderId || $isIncludeSelf)
             {
                 $data = array();
                 $data["type"] = $type;
@@ -106,11 +105,11 @@ class ExecModel extends CI_Model
                 $data["roomId"] = $roomId;
                 $data["param"] = $param;
                 array_push($insertDatas, $data);
-                
+
                 $log = array();
                 $log["value"] = json_encode($data);
+                $log["time"] = date("Y-m-d H:i:s");
                 array_push($insertLogs, $log);
-                
             }
         }
         if (count($insertDatas) > 0)
@@ -133,7 +132,7 @@ class ExecModel extends CI_Model
         $lastEventId = 0;
         foreach ($result as $row)
         {
-            switch($row->type)
+            switch ($row->type)
             {
                 case 'roomChanged':
                     $param = array("Players" => $roomModel->playerInfo($roomId, $out));

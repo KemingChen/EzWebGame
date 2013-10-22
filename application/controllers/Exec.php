@@ -22,8 +22,23 @@ class Exec extends CI_Controller
     {
         $nextCKey = $this->AuthModel->getNextCommuKey($cKey, $this->out);
         list($key, $userId, $gameId, $roomId) = explode('_', $cKey);
+        
+        // 獲取房間資料
         $this->load->model("RoomModel", "room");
-        $this->ExecModel->start($userId, $roomId, $this->out, $this->room);
+        $roomInfo = $this->room->roomInfo($this->out, $roomId);
+        $this->out->delete("Room");
+        $roomPlayers = $this->room->playerInfo($roomId, $this->out);
+        
+        $turnPlayer = $this->ExecModel->start($userId, $roomId, $this->out, $roomInfo, $roomPlayers);
+        
+        // 告知其他玩家 遊戲開始
+        $message = sprintf("Room[%d] Start Game", $roomId);
+        $this->ExecModel->send("start", $message, $userId, $roomId, $roomPlayers);
+        
+        // 告知所有玩家 現在換誰
+        $message = json_encode($turnPlayer);
+        $this->ExecModel->send("turn", $message, $userId, $roomId, $roomPlayers, true);
+        
         $this->out->save("Start", true);
         $this->out->show();
     }

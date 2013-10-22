@@ -61,7 +61,8 @@ class Room extends CI_Controller
             
             // 告知其他玩家 自己加入房間
             $this->load->model("ExecModel", "Exec");
-            $this->Exec->send("roomChanged", "Room has Changed", $userId, $roomId, $roomPlayers);
+        $message = sprintf("User[%d] Join Room[%d]", $userId, $roomId);
+            $this->Exec->send("roomChanged", $message, $userId, $roomId, $roomPlayers);
         }
         $this->AuthModel->editCommuKey($nextCKey, $iRoomId, $this->out);
         $this->out->save("Join", $roomId);
@@ -87,7 +88,8 @@ class Room extends CI_Controller
         $this->load->model("ExecModel", "Exec");
         $roomPlayers = $this->RoomModel->playerInfo($roomId, $this->out);
         $this->out->delete("Players");
-        $this->Exec->send("roomChanged", "Room has Changed", $userId, $roomId, $roomPlayers);
+        $message = sprintf("User[%d] Leave Room[%d]", $userId, $roomId);
+        $this->Exec->send("roomChanged", $message, $userId, $roomId, $roomPlayers);
         
         $this->out->save("Leave", true);
         $this->out->show();
