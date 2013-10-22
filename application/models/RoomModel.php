@@ -211,6 +211,20 @@ class RoomModel extends CI_Model
     }
 
     /**
+     * RoomModel::deleteSelfFromAnyRoom()
+     * 
+     * 刪除所有自己所在之任何房間
+     * 
+     * @param mixed $userId
+     * @return void
+     */
+    public function deleteSelfFromAnyRoom($userId)
+    {
+        $this->db->where("userId", $userId);
+        $this->db->delete("room_to_user");
+    }
+
+    /**
      * RoomModel::checkRoomCanJoin()
      * 
      * 確認此房間是否能加入

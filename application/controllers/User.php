@@ -93,6 +93,10 @@ class User extends CI_Controller
             $nextCKey = $this->AuthModel->commuKeygen($auth["id"], $gameId, 0); // 產生 溝通key
             $this->AuthModel->saveCommuKey($auth["id"], $gameId, $nextCKey); // 儲存溝通key
             $this->out->save("cKey", $nextCKey);
+            
+            // 刪除之前所在之房間
+            $this->load->model("RoomModel", "room");
+            $this->room->deleteSelfFromAnyRoom($auth["id"]);
         }
         else
         {
