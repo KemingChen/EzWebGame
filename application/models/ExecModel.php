@@ -95,6 +95,7 @@ class ExecModel extends CI_Model
     public function send($type, $param, $senderId, $roomId, $roomPlayers)
     {
         $insertDatas = array();
+        $insertLogs = array();
         foreach ($roomPlayers as $roomPlayer)
         {
             if ($roomPlayer["userId"] != $senderId)
@@ -105,11 +106,17 @@ class ExecModel extends CI_Model
                 $data["roomId"] = $roomId;
                 $data["param"] = $param;
                 array_push($insertDatas, $data);
+                
+                $log = array();
+                $log["value"] = json_encode($data);
+                array_push($insertLogs, $log);
+                
             }
         }
         if (count($insertDatas) > 0)
         {
             $this->db->insert_batch("event", $insertDatas);
+            $this->db->insert_batch("log", $insertLogs);
         }
     }
 
@@ -134,7 +141,7 @@ class ExecModel extends CI_Model
                 default:
                     $param = $row->param;
             }
-            array_push($array, array("Type" => $row->type, "Param" => $param));
+            array_push($array, $out->convertToEvent($row->type, $param));
             $lastEventId = $row->id;
         }
 

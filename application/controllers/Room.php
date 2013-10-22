@@ -86,7 +86,7 @@ class Room extends CI_Controller
         // 告知其他玩家 自己離開房間
         $this->load->model("ExecModel", "Exec");
         $roomPlayers = $this->RoomModel->playerInfo($roomId, $this->out);
-        //$this->out->delete("Players");
+        $this->out->delete("Players");
         $this->Exec->send("roomChanged", "Room has Changed", $userId, $roomId, $roomPlayers);
         
         $this->out->save("Leave", true);

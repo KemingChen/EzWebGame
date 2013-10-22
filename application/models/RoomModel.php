@@ -139,17 +139,17 @@ class RoomModel extends CI_Model
     {
         $result = $this->getRoomPlayers($roomId);
 
-        $player = array();
+        $players = array();
         foreach ($result as $row)
         {
             $array = array();
             $array["userId"] = $row->id;
             $array["userName"] = $row->userName;
 
-            array_push($player, $array);
+            array_push($players, $array);
         }
-        $out->save("Player", $player);
-        return $player;
+        $out->save("Players", $players);
+        return $players;
     }
 
     /**

@@ -13,7 +13,7 @@ class OutputModel extends CI_Model
     {
         parent::__construct();
     }
-    
+
     /**
      * OutputModel::delete()
      * 
@@ -105,6 +105,20 @@ class OutputModel extends CI_Model
         echo "\n\n";
         $this->output = array();
         flush();
+    }
+
+    /**
+     * OutputModel::convertToEvent()
+     * 
+     * Event Format is "array("Type" => $key, "Param" => $value)"
+     * 
+     * @param mixed $key
+     * @param mixed $value
+     * @return
+     */
+    public function convertToEvent($key, $value)
+    {
+        return array("Type" => $key, "Param" => $value);
     }
 }
 
