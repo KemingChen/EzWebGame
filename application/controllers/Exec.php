@@ -52,11 +52,12 @@ class Exec extends CI_Controller
      * @param mixed $cKey
      * @return void
      */
-    public function SendMessage($message, $cKey)
+    public function SendMessage($cKey)
     {
         $nextCKey = $this->AuthModel->getNextCommuKey($cKey, $this->out);
         list($key, $userId, $gameId, $roomId) = explode('_', $cKey);
 
+        $message = $this->input->post('message');
         $roomInfo = $this->checkRoomExistAndIsTurnMe($userId, $roomId);
         $roomPlayers = $this->room->playerInfo($roomId, $this->out);
         $this->ExecModel->send("message", $message, $userId, $roomId, $roomPlayers);
