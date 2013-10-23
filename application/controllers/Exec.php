@@ -78,8 +78,20 @@ class Exec extends CI_Controller
 
         $roomInfo = $this->checkRoomExistAndIsTurnMe($userId, $roomId);
         $playerId = $this->ExecModel->next($roomInfo, $userId, $roomId);
-        $this->out->save("NextRound", $playerId);
-
+        $roomPlayers = $this->room->playerInfo($roomId, $this->out);
+        foreach($roomPlayers as $player)
+        {
+            if($player["userId"] == $playerId)
+            {
+                $this->out->save("NextRound", $player);
+                
+                // 告知所有玩家 現在換誰
+                $message = json_encode($player);
+                $this->ExecModel->send("turn", $message, $userId, $roomId, $roomPlayers);
+                break;
+            }
+        }
+        
         $this->out->show();
     }
     
