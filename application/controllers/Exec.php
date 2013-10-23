@@ -161,8 +161,7 @@ class Exec extends CI_Controller
                 }
                 if($player["userId"] == $winUserId)
                 {
-                    $message = json_encode($player);
-                    $this->ExecModel->send("arrived", $message, $userId, $roomId, $roomPlayers, true);
+                    $whoArrived = json_encode($player);
                 }
             }
             
@@ -195,6 +194,8 @@ class Exec extends CI_Controller
             }
             else
             {
+                // 告知有玩家抵達終點
+                $this->ExecModel->send("arrived", $whoArrived, $userId, $roomId, $roomPlayers, true);
                 // 告知所有玩家 現在換誰
                 $this->ExecModel->send("turn", $turnWhoMessage, $userId, $roomId, $roomPlayers, true);
             }
