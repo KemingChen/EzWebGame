@@ -62,6 +62,14 @@ class ExecModel extends CI_Model
         }
     }
 
+    public function end($roomId)
+    {
+        $this->db->where("id", $roomId);
+        $data = array("arriveId" => null, "winList" => null, "playingList" => null,
+            "status" => "wait");
+        $this->db->update("gameroom", $data);
+    }
+
     /**
      * ExecModel::roomPlayersToString()
      * 

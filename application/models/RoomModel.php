@@ -280,6 +280,38 @@ class RoomModel extends CI_Model
             $out->wrong(sprintf("User In %d Room", $result[0]->roomId));
         }
     }
+
+    public function waitCheckWin($roomId, $userId)
+    {
+        $this->db->where("id", $roomId);
+        $data = array("arriveId" => $userId);
+        $this->db->update("gameroom", $data);
+    }
+
+    public function getWaitCheckWinUserId($roomId)
+    {
+        $this->db->select("arriveId");
+        $this->db->from("gameroom");
+        $this->db->where("id", $roomId);
+        $result = $this->db->get()->result();
+        return $result[0]->arriveId;
+    }
+
+    public function saveToWinList($roomId, $userId)
+    {
+        $this->db->select("winList");
+        $this->db->from("gameroom");
+        $this->db->where("id", $roomId);
+        $result = $this->db->get()->result();
+
+        $winList = $result[0]->winList == null ? $userId : $result[0]->winList . "-" . $userId;
+
+        $this->db->where("id", $roomId);
+        $data = array("arriveId" => null, "winList" => $winList);
+        $this->db->update("gameroom", $data);
+        
+        return $winList;
+    }
 }
 
 ?>
