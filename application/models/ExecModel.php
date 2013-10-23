@@ -134,6 +134,7 @@ class ExecModel extends CI_Model
         {
             switch ($row->type)
             {
+                case 'start':
                 case 'roomChanged':
                     $param = array("Players" => $roomModel->playerInfo($roomId, $out));
                     break;
