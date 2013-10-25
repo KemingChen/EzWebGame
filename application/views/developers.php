@@ -19,6 +19,9 @@
 <input type="button" class="btn btn-primary" value="Query GameKey"/>
 <br />
 <br />
+<input type="button" class="btn btn-primary" value="Download Library"/>
+<br />
+<br />
 <script type="text/javascript">
 $(".header ul li").each(function(){$(this).removeClass('active')});
 $(".header ul li:eq(1)").addClass('active');
@@ -40,6 +43,9 @@ $("input[value='Query GameKey']").on('click',function(){
         sendNameAndPasswordTo('./game/getGameKey','Query Result');
     $("#dataInputDIV input[value='Register']").hide();
     $("#dataInputDIV input[value='Query Key']").show();
+});
+$("input[value='Download Library']").on('click',function(){
+    window.open("http://140.124.181.7:1221/GameRound/EzWebGameLib.rar");
 });
 $("#dataInputDIV input[value='Register']").on('click',function(){
     sendNameAndPasswordTo('./game/create','Register Result');
