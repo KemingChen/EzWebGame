@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 -- 
 -- 主機: localhost:2819
--- 建立日期: Oct 18, 2013, 12:18 PM
+-- 建立日期: Oct 27, 2013, 10:23 PM
 -- 伺服器版本: 6.0.4
 -- PHP 版本: 6.0.0-dev
 
@@ -37,40 +37,19 @@ CREATE TABLE `auth` (
 -- --------------------------------------------------------
 
 -- 
--- 資料表格式： `command`
--- 
-
-CREATE TABLE `command` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `roomId` int(11) NOT NULL,
-  `userId` int(11) NOT NULL,
-  `timestamp` date NOT NULL,
-  `count` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `roomId` (`roomId`,`userId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-
--- 
--- 列出以下資料庫的數據： `command`
--- 
-
-
--- --------------------------------------------------------
-
--- 
 -- 資料表格式： `event`
 -- 
 
 CREATE TABLE `event` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `type` enum('message') NOT NULL,
+  `type` enum('message','roomChanged','start','turn','checkWin','arrived','rank') NOT NULL,
   `receiverId` int(11) NOT NULL,
   `roomId` int(11) NOT NULL,
   `param` varchar(1024) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `receiverId` (`receiverId`),
   KEY `roomId` (`roomId`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- 
 -- 列出以下資料庫的數據： `event`
@@ -114,9 +93,12 @@ CREATE TABLE `gameroom` (
   `max` int(11) NOT NULL,
   `status` enum('wait','start') NOT NULL,
   `playingList` varchar(150) DEFAULT NULL,
+  `arriveId` int(11) DEFAULT NULL,
+  `winList` varchar(150) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `gameId` (`gameId`),
-  KEY `turn` (`turn`)
+  KEY `turn` (`turn`),
+  KEY `arriveId` (`arriveId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- 
@@ -147,6 +129,24 @@ CREATE TABLE `gauth` (
 -- --------------------------------------------------------
 
 -- 
+-- 資料表格式： `log`
+-- 
+
+CREATE TABLE `log` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `value` varchar(1024) NOT NULL,
+  `time` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+-- 
+-- 列出以下資料庫的數據： `log`
+-- 
+
+
+-- --------------------------------------------------------
+
+-- 
 -- 資料表格式： `room_to_user`
 -- 
 
@@ -157,7 +157,7 @@ CREATE TABLE `room_to_user` (
   PRIMARY KEY (`id`),
   KEY `userId` (`userId`),
   KEY `roomId` (`roomId`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=11 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=601 ;
 
 -- 
 -- 列出以下資料庫的數據： `room_to_user`
@@ -178,7 +178,7 @@ CREATE TABLE `user` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `userName` (`userName`),
   UNIQUE KEY `account` (`account`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=16 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=22 ;
 
 -- 
 -- 列出以下資料庫的數據： `user`
@@ -186,8 +186,14 @@ CREATE TABLE `user` (
 
 INSERT INTO `user` VALUES (1, 'keming', 'keming', '1234');
 INSERT INTO `user` VALUES (2, 'gary', 'gary', '1234');
-INSERT INTO `user` VALUES (14, '123', '123', '123');
+INSERT INTO `user` VALUES (14, 'T4', '123', '123');
 INSERT INTO `user` VALUES (15, 'Alice', '1234', '1234');
+INSERT INTO `user` VALUES (16, 'jack', '12', '12');
+INSERT INTO `user` VALUES (17, 'Onyx', 'member0', '1234');
+INSERT INTO `user` VALUES (18, 'Felix', 'member1', '1234');
+INSERT INTO `user` VALUES (19, 'jacky', '12345', '12345');
+INSERT INTO `user` VALUES (20, 'App', 'app', 'app');
+INSERT INTO `user` VALUES (21, 'wowodo', 'wowodo', 'wowodo');
 
 -- 
 -- 備份資料表限制
@@ -197,13 +203,14 @@ INSERT INTO `user` VALUES (15, 'Alice', '1234', '1234');
 -- 資料表限制 `event`
 -- 
 ALTER TABLE `event`
-  ADD CONSTRAINT `event_ibfk_2` FOREIGN KEY (`roomId`) REFERENCES `gameroom` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `event_ibfk_1` FOREIGN KEY (`receiverId`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `event_ibfk_1` FOREIGN KEY (`receiverId`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `event_ibfk_2` FOREIGN KEY (`roomId`) REFERENCES `gameroom` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- 
 -- 資料表限制 `gameroom`
 -- 
 ALTER TABLE `gameroom`
+  ADD CONSTRAINT `gameroom_ibfk_3` FOREIGN KEY (`arriveId`) REFERENCES `user` (`id`),
   ADD CONSTRAINT `gameroom_ibfk_1` FOREIGN KEY (`gameId`) REFERENCES `gameinfo` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `gameroom_ibfk_2` FOREIGN KEY (`turn`) REFERENCES `user` (`id`);
 
